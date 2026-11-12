@@ -52,14 +52,14 @@ module.exports = async (req, res) => {
       method: "POST",
       headers: { "xi-api-key": key, "content-type": "application/json" },
       body: JSON.stringify({
-        text,
+        text: speakable(text).out,
         model_id: process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5",
         voice_settings: { stability: st.stability, similarity_boost: 0.8, style: st.style, speed: st.speed, use_speaker_boost: true }
       })
     });
     if (!r.ok) return res.status(502).json({ error: "voice_failed" });
     const d = await r.json();
-    const out = { audio: d.audio_base64, alignment: d.alignment || d.normalized_alignment || null };
+    const out = { audio: d.audio_base64, alignment: remapAlign(d.alignment || d.normalized_alignment || null, text) };
     if (cache.size > 150) cache.clear();
     cache.set(ck, out);
     return res.json(out);
@@ -67,3 +67,33 @@ module.exports = async (req, res) => {
     return res.status(502).json({ error: "voice_failed" });
   }
 };
+
+// ---------- read math symbols out loud ----------
+// "C1 x V1" or "3 x 4" -> "times" (not "ex"), × -> "times", π -> "pie" (so it is never read "p-i"), ² -> "squared", ³ -> "cubed",
+// √ -> "the square root of". The read-along timing is mapped back to the original letters,
+// so the word highlighting on screen still lines up.
+const SAY_SYMBOL = { "x": "times", "×": "times", "π": "pie", "²": "squared", "³": "cubed", "√": "the square root of" };
+function speakable(text) {
+  const re = /(\d[\d.,]*(?:\s?(?:cm|mm|km|m|in|ft|yd|inches|feet|meters|units))?|\b[A-Za-z]{1,3}\d+[A-Za-z]?|\))(\s*)(x)(\s*)(?=\d|\(|[A-Za-z]{1,3}\d)|([×π²³√])/g;
+  let out = "", last = 0, m;
+  const map = new Array(text.length);
+  while ((m = re.exec(text))) {
+    const xPos = m[5] ? m.index : m.index + m[1].length + m[2].length;
+    for (let i = last; i < xPos; i++) { map[i] = out.length; out += text[i]; }
+    const prev = xPos > 0 ? text[xPos - 1] : "", next = xPos + 1 < text.length ? text[xPos + 1] : "";
+    const padL = (!prev || /[\s(]/.test(prev)) ? "" : " ";
+    const padR = (!next || /[\s.,;:!?)]/.test(next)) ? "" : " ";
+    map[xPos] = out.length + padL.length;
+    out += padL + SAY_SYMBOL[text[xPos]] + padR;
+    last = xPos + 1;
+    re.lastIndex = last;
+  }
+  for (let i = last; i < text.length; i++) { map[i] = out.length; out += text[i]; }
+  return { out, map };
+}
+function remapAlign(al, text) {
+  const { out, map } = speakable(text);
+  if (!al || out === text || !Array.isArray(al.character_start_times_seconds) || al.character_start_times_seconds.length !== out.length) return al;
+  const s = al.character_start_times_seconds, e = al.character_end_times_seconds || s;
+  return { characters: text.split(""), character_start_times_seconds: map.map(j => s[j]), character_end_times_seconds: map.map(j => e[j]) };
+}
