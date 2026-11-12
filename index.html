@@ -39,11 +39,13 @@ a{color:var(--gold)}
 .step h2{margin:0 0 4px;font-family:'Archivo Black',Inter,sans-serif;font-size:clamp(20px,2.4vw,26px);letter-spacing:.3px}
 .step h2 b{color:var(--gold);margin-right:6px}
 .step .sub{color:var(--soft);font-weight:600;margin:0 0 14px;font-size:15px}
-.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:thin}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .cat{flex:none;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14.5px}
 .cat.on{background:var(--gold);color:#2a1d00;border-color:var(--gold)}
-.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px 16px;font-weight:700;font-size:15.5px;text-align:left}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15.5px;text-align:left;min-height:68px;line-height:1.25}
+.chip.ownc{border:2px dashed var(--gold);background:transparent;color:var(--gold);text-align:center}
+.chip.ownc.on{background:rgba(255,201,74,.12)}
 .chip:hover{border-color:var(--gold);transform:translateY(-1px)}
 .own{display:flex;gap:10px}
 .own input{flex:1;min-width:0;height:56px;border:2px solid var(--line);border-radius:14px;background:#170a2a;color:var(--ink);padding:0 16px;font-size:18px;font-family:inherit;outline:none}
@@ -204,8 +206,52 @@ a{color:var(--gold)}
 .notice{margin-top:20px;font-size:13px;color:var(--soft);text-align:center;line-height:1.5}
 
 @media (max-width:900px){.arena{grid-template-columns:1fr}.stage{max-width:520px;margin:0 auto;width:100%}}
-@media (max-width:700px){.faces{grid-template-columns:repeat(2,1fr)}.personas{grid-template-columns:1fr 1fr}.sides{grid-template-columns:1fr}.vs{text-align:center}.own{flex-wrap:wrap}.own .go{width:100%}.scores{grid-template-columns:1fr}.rategrp{margin-left:0}}
+@media (max-width:700px){.chips{grid-template-columns:1fr 1fr}.chip.ownc{grid-column:1/-1;min-height:54px}.faces{grid-template-columns:repeat(2,1fr)}.personas{grid-template-columns:1fr 1fr}.sides{grid-template-columns:1fr}.vs{text-align:center}.own{flex-wrap:wrap}.own .go{width:100%}.scores{grid-template-columns:1fr}.rategrp{margin-left:0}}
 @media (max-width:420px){.personas{grid-template-columns:1fr}}
+
+/* type your own */
+.ownbox{margin-bottom:4px}
+/* watch mode */
+.watchbtn{display:block;width:100%;margin:16px 0 0;border:2px solid var(--line);background:linear-gradient(135deg,#3b1f66,#2a1747);color:var(--ink);border-radius:16px;padding:16px;font-weight:800;font-size:18px}
+.watchbtn small{display:block;color:var(--soft);font-weight:600;font-size:13.5px;margin-top:4px}
+.watchbtn:hover,.watchbtn.picked{border-color:var(--gold)}
+.or{text-align:center;color:var(--soft);font-weight:700;font-size:13px;margin-top:14px;letter-spacing:.5px}
+.pick2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.pcol{background:var(--bg2);border-radius:16px;padding:14px;border-top:5px solid var(--a)}
+.pcol.B{border-top-color:var(--b)}
+.pcol h3{margin:0 0 10px;font-size:16px}
+.pcol h3 span{color:var(--a)}.pcol.B h3 span{color:var(--b)}
+.faces.sm{gap:8px;margin-bottom:10px}
+.faces.sm .face .nm{font-size:13.5px;padding:6px 4px 8px}
+.faces.sm .face .nm small{display:none}
+.faces.sm .face .fallback{font-size:34px}
+.personas.sm{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0}
+.personas.sm .persona{padding:9px 10px}
+.personas.sm .persona b{font-size:13.5px;margin:0}
+.personas.sm .persona span{display:none}
+.avwrap{position:relative}
+.avs{display:grid;grid-template-columns:1fr;gap:10px}
+.avs.duo{grid-template-columns:1fr 1fr}
+.avs.duo .avatar{opacity:.5;transform:scale(.96);transition:opacity .25s,transform .25s,box-shadow .25s}
+.avs.duo .avatar.live{opacity:1;transform:none;box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,201,74,.35)}
+.avs.duo .avatar .fallback{font-size:80px}
+.avs.duo .plate .who{font-size:14px;padding:6px 10px}
+.plate .who.A{border-left:5px solid var(--a)}.plate .who.B{border-left:5px solid var(--b)}
+.avwrap .thinking{border-radius:14px}
+.caption .spk{font-weight:800;margin-right:6px}
+.caption .spk.A{color:var(--a)}.caption .spk.B{color:var(--b)}
+.arena.watch{grid-template-columns:1.15fr 1fr}
+.log .entry.A b{color:var(--a)}.log .entry.B b{color:var(--b)}.log .entry.mod b{color:var(--green)}
+.screen.auto{aspect-ratio:auto;min-height:220px}
+.pts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.pts.n1{grid-template-columns:1fr}
+.pt{background:#1d0f33;border-radius:12px;padding:12px 14px;border-left:6px solid var(--a)}
+.pt.B{border-left-color:var(--b)}
+.pt .pl{font-size:12.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.pt .ptx{font-size:15.5px;line-height:1.45;font-weight:600}
+.pt .ps{font-size:12.5px;font-weight:800;margin-top:7px;color:var(--a)}.pt.B .ps{color:var(--b)}
+@media (max-width:560px){.rrow{flex-wrap:wrap}.rrow textarea{flex-basis:100%;order:-1}.mic{height:54px}.send{flex:1;height:54px}.avs.duo .plate{left:6px;right:6px;bottom:6px}.avs.duo .plate .who{font-size:12.5px;padding:4px 8px}.avs.duo .plate .who small{display:none}}
+@media (max-width:700px){.pick2{grid-template-columns:1fr}.pts{grid-template-columns:1fr}.arena.watch{grid-template-columns:1fr}.avs.duo .avatar .fallback{font-size:56px}}
 </style>
 </head>
 <body>
@@ -228,8 +274,8 @@ a{color:var(--gold)}
       <p class="sub">Choose a classic debate, or type your own.</p>
       <div class="cats" id="cats"></div>
       <div class="chips" id="chips"></div>
-      <div class="own">
-        <input id="topicIn" maxlength="200" placeholder="Or type your own… e.g. Beatles vs Rolling Stones" autocomplete="off">
+      <div class="own ownbox hide" id="ownRow">
+        <input id="topicIn" maxlength="200" placeholder="e.g. Beatles vs Stones" autocomplete="off">
         <button class="go" id="topicGo">Let's go ▶</button>
       </div>
       <div class="status" id="s1"></div>
@@ -244,13 +290,21 @@ a{color:var(--gold)}
         <button class="side B" id="sideB"></button>
       </div>
       <button class="surprise" id="surprise">🎲 You pick for me</button>
+      <div class="or">— OR —</div>
+      <button class="watchbtn" id="watchBtn">🍿 Watch two debaters argue it out<small>Pick both debaters, sit back, and jump in as the moderator.</small></button>
     </div>
 
     <div class="step hide" id="step3">
-      <h2><b>3</b>Pick your opponent</h2>
-      <p class="sub">Choose a face, then a personality. Same facts, different attitude.</p>
-      <div class="faces" id="faces"></div>
-      <div class="personas" id="personas"></div>
+      <h2 id="s3title"><b>3</b>Pick your opponent</h2>
+      <p class="sub" id="s3sub">Choose a face, then a personality. Same facts, different attitude.</p>
+      <div id="pickOne">
+        <div class="faces" id="faces"></div>
+        <div class="personas" id="personas"></div>
+      </div>
+      <div id="pickTwo" class="pick2 hide">
+        <div class="pcol A"><h3>Arguing for <span id="pcA"></span></h3><div class="faces sm" id="facesA"></div><div class="personas sm" id="personasA"></div></div>
+        <div class="pcol B"><h3>Arguing for <span id="pcB"></span></h3><div class="faces sm" id="facesB"></div><div class="personas sm" id="personasB"></div></div>
+      </div>
       <div class="startrow">
         <button class="sample" id="sampleBtn">▶ Hear a sample</button>
         <button class="go big" id="startBtn">Let's debate! 🎤</button>
@@ -267,20 +321,19 @@ a{color:var(--gold)}
       <div class="rounds" id="rounds"></div>
     </div>
 
-    <div class="arena">
+    <div class="arena" id="arena">
       <div class="stage">
-        <div class="avatar" id="avatar">
-          <div class="head" id="head"></div>
-          <div class="spot"></div>
-          <div class="plate"><div class="who" id="who"></div></div>
+        <div class="avwrap">
+          <div class="avs" id="avs"></div>
           <div class="thinking" id="thinking"><div class="dots"><span></span><span></span><span></span></div><div id="thinkMsg"></div></div>
           <div class="tapplay" id="tapplay"><button id="tapBtn">▶ Tap to hear</button></div>
         </div>
-        <div class="caption" id="caption"><span class="ph">Your opponent will speak here.</span></div>
+        <div class="caption" id="caption"><span class="ph">The debate will appear here.</span></div>
         <div class="ctrls">
           <button class="cbtn" id="pauseBtn" disabled>⏸ Pause</button>
           <button class="cbtn" id="contBtn" disabled>▶ Continue</button>
           <button class="cbtn" id="replayBtn" disabled>⏮ Replay</button>
+          <button class="cbtn hide" id="skipBtn">⏭ Next</button>
           <label class="rategrp">Voice speed <input type="range" id="rate" min="0.75" max="1.3" step="0.05" value="1"> <span id="rateVal">1.0×</span></label>
         </div>
       </div>
@@ -290,7 +343,7 @@ a{color:var(--gold)}
           <h3 id="pTitle">Proof board</h3>
           <div class="pager"><button id="pPrev" disabled>‹</button><span id="pNum"></span><button id="pNext" disabled>›</button></div>
         </div>
-        <div class="screen" id="screen"><div class="empty">📊 Charts and proof will appear here as your opponent makes their case.</div></div>
+        <div class="screen" id="screen"><div class="empty">📊 Charts and proof will appear here as the case is made.</div></div>
         <div class="pcap" id="pCap"></div>
         <div id="pCheck"></div>
         <div class="srcs" id="pSrcs"></div>
@@ -303,33 +356,36 @@ a{color:var(--gold)}
       </div>
     </div>
 
-    <div class="reply">
-      <div class="lab">Your turn <span id="replyHint">Type or tap 🎤 and make your case.</span></div>
+    <div class="reply" id="replyBox">
+      <div class="lab"><span id="replyLab" style="color:var(--ink);font-weight:800;font-size:15px">Your turn</span> <span id="replyHint">Type or tap 🎤 and make your case.</span></div>
       <div class="rrow">
         <button class="mic" id="micBtn" title="Talk">🎤</button>
         <textarea id="replyIn" maxlength="800" placeholder="Make your argument…"></textarea>
         <button class="send" id="sendBtn">Send ➤</button>
       </div>
-      <div class="moves">
+      <div class="moves" id="playMoves">
         <button class="move" id="mProof">📊 Show me proof</button>
         <button class="move" id="mSource">🔎 Where's that from?</button>
         <button class="move" id="mUnfair">✋ That's not fair because…</button>
         <button class="move" id="mSwitch">🔄 Switch sides</button>
         <button class="move judge" id="mJudge">🏆 End &amp; judge</button>
       </div>
+      <div class="moves hide" id="watchMoves">
+        <button class="move judge" id="wJudge">🏆 Judge it now</button>
+      </div>
     </div>
 
     <details class="log" id="log"><summary>📜 The debate so far</summary><div id="logList"></div></details>
   </section>
 
-  <div class="notice">Debate Me is an AI game. Your opponent is an AI character that researches trusted sites, but always double-check facts that matter. Feisty is fine. Mean never is.</div>
+  <div class="notice">Debate Me is an AI game. The debaters are AI characters that research trusted sites, but always double-check facts that matter. Feisty is fine. Mean never is.</div>
 </div>
 
 <!-- judge -->
 <div class="overlay" id="judgeOv">
   <div class="card">
     <h2>🏆 The Judge's Scorecard</h2>
-    <div id="judgeBody"><div class="verdict">The judge is reviewing the tape… <div class="dots"><span></span><span></span><span></span></div></div></div>
+    <div id="judgeBody"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -338,6 +394,7 @@ a{color:var(--gold)}
 (function(){
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : v; } catch(e){ return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch(e){} } };
 
 // ---------- data ----------
@@ -348,9 +405,8 @@ const CATS = [
   { id:"history", label:"🏛️ History", topics:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson"] },
   { id:"food", label:"🍔 Food & Health", topics:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Is breakfast the most important meal?"] },
   { id:"home", label:"🏠 Home & Life", topics:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets"] },
-  { id:"art", label:"🎨 Art", topics:["Picasso vs Van Gogh","Leonardo da Vinci vs Michelangelo","Monet vs Rembrandt","Is photography real art?"] },
   { id:"toys", label:"🧸 Toys & Pop Culture", topics:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation"] },
-  { id:"kids", label:"🧒 Kids", topics:["Summer vs winter","Pizza vs tacos","Is a hot dog a sandwich?","Dinosaurs vs sharks"] }
+  { id:"other", label:"✨ Other", topics:["Picasso vs Van Gogh","Is a hot dog a sandwich?","Books vs movies","Morning person vs night owl"] }
 ];
 const FACES = {
   young:  { name:"Jake",   age:"30s", emoji:"🧢", color:"#2bb3b1" },
@@ -359,32 +415,43 @@ const FACES = {
   smooth: { name:"Marcus", age:"40s", emoji:"😎", color:"#8a63d2" }
 };
 const PERSONAS = {
-  professor:   { label:"🎓 The Professor", desc:"Calm, smart, all about the data", sample:"Hello, I'm {n}. I'll be taking the other side today, and I've brought the numbers. The evidence, as you'll see, is quite clear." },
-  radio:       { label:"📻 The Sports-Radio Host", desc:"Loud, feisty, playful trash talk", sample:"Folks, it's {n} and we are LIVE! You really think you can win this one? Come ON! Bring your best shot, because I've got the stats!" },
+  professor:   { label:"🎓 The Professor", desc:"Calm, smart, all about the data", sample:"Hello, I'm {n}. I'll be taking the other side today, and I've brought the evidence. As you'll see, it's quite clear." },
+  radio:       { label:"📻 The Sports-Radio Host", desc:"Loud, feisty, playful trash talk", sample:"Folks, it's {n} and we are LIVE! You really think you can win this one? Come ON! Bring your best shot!" },
   drama:       { label:"🎭 The Drama Star", desc:"Emotional, theatrical, takes it personally", sample:"I'm {n}, darling, and I simply cannot believe you'd take that side. I'm wounded! Truly wounded! But fine. Let's do this." },
-  lawyer:      { label:"⚖️ The Lawyer", desc:"Sharp logic, pokes holes", sample:"{n}, for the other side. Let the record show I came prepared. Every claim you make, I will cross-examine. Your move, counselor." },
-  storyteller: { label:"👴 The Storyteller", desc:"Warm, folksy, argues with memories", sample:"Well hello there, I'm {n}. Pull up a chair. I remember the good old days, and I've got the facts to back them up. Let's have a friendly argument." },
+  lawyer:      { label:"⚖️ The Lawyer", desc:"Sharp logic, pokes holes", sample:"{n}, for the other side. Let the record show I came prepared. Every claim you make, I will cross-examine." },
+  storyteller: { label:"👴 The Storyteller", desc:"Warm, folksy, argues with memories", sample:"Well hello there, I'm {n}. Pull up a chair. I remember the good old days, and I've got the facts to back them up." },
   smooth:      { label:"😎 The Smooth Talker", desc:"Witty, charming, quietly devastating", sample:"I'm {n}. Lovely to meet you. With all respect, my friend, you've picked the wrong side. But I'll be gentle. Mostly." }
 };
 const EXPRS = ["calm","talk","smug","outraged","laugh"];
 const THINK = {
-  open:"{n} is reading the research…", reply:"{n} is cooking up a comeback…", proof:"{n} is pulling the receipts…",
+  open:"{n} is reading the research…", rebut_open:"{n} is sizing up the opening…", reply:"{n} is cooking up a comeback…", proof:"{n} is pulling the receipts…",
   source:"{n} is checking the sources…", unfair:"{n} is thinking that over…", challenge_proof:"{n} is defending the proof…",
-  switch:"{n} is switching sides…", closing:"{n} is preparing a closing statement…"
+  switch:"{n} is switching sides…", closing:"{n} is preparing a closing statement…", moderator:"{n} is answering the moderator…"
 };
+// Picture names: young / female / oldman / black, then 1 talk, 2 smug, 3 outraged, 4 laugh, 5 plain
+const FILE = { young:"young", woman:"female", older:"oldman", smooth:"black" };
+const NUM = { talk:1, smug:2, outraged:3, laugh:4, calm:5 };
+const EXTS = ["png","jpg","jpeg","webp","PNG","JPG"];
+function faceSrc(f, ex, e){ return FILE[f] + NUM[ex] + "." + EXTS[e || 0]; }
+function nextExt(img, f, ex){ const e = (parseInt(img.dataset.e) || 0) + 1; if (e >= EXTS.length) return false; img.dataset.e = e; img.src = faceSrc(f, ex, e); return true; }
+window.dmNextExt = nextExt;
 
 // ---------- state ----------
+let savedDeb = null; try { savedDeb = JSON.parse(store.get("dm_deb", "null")); } catch(e){}
 const S = {
-  kid: store.get("dm_kid","0") === "1",
+  kid: store.get("dm_kid","0") === "1", mode:"play",
   face: store.get("dm_face","smooth"), persona: store.get("dm_persona","smooth"),
+  deb: (savedDeb && savedDeb.A && savedDeb.B && FACES[savedDeb.A.face] && FACES[savedDeb.B.face]) ? savedDeb : { A:{ face:"smooth", persona:"smooth" }, B:{ face:"woman", persona:"radio" } },
   frame:null, researchP:null, facts:[], web:false, searched:[],
   userSide:null, aiSide:null, history:[], round:0, proofs:[], pIdx:-1,
-  busy:false, pending:null, last:null, ended:false
+  busy:false, pending:null, last:null, wtoken:0, plan:[], wi:0, modQ:null
 };
 if (!FACES[S.face]) S.face = "smooth";
 if (!PERSONAS[S.persona]) S.persona = "smooth";
 const nameOf = () => FACES[S.face].name;
+const debName = k => FACES[S.deb[k].face].name;
 const sideName = k => k === "A" ? S.frame.sideA : S.frame.sideB;
+const other = k => k === "A" ? "B" : "A";
 
 // ---------- helpers ----------
 let toastT;
@@ -403,17 +470,22 @@ async function post(url, body, ms){
 function paintKid(){ $("kidBtn").textContent = "🧒 Kid-friendly: " + (S.kid ? "On" : "Off"); $("kidBtn").classList.toggle("on", S.kid); }
 $("kidBtn").onclick = () => { S.kid = !S.kid; store.set("dm_kid", S.kid ? "1" : "0"); paintKid(); };
 paintKid();
-$("newTopic").onclick = () => { stopVoice(); location.replace(location.pathname); };
+$("newTopic").onclick = () => { stopAll(); location.replace(location.pathname); };
 
 // ---------- step 1 ----------
-let catOn = S.kid ? "kids" : "sports";
+let catOn = "sports";
 function paintCats(){
   $("cats").innerHTML = CATS.map(c => `<button class="cat${c.id === catOn ? " on" : ""}" data-c="${c.id}">${c.label}</button>`).join("");
   const cat = CATS.find(c => c.id === catOn);
-  $("chips").innerHTML = cat.topics.map(t => `<button class="chip">${esc(t)}</button>`).join("");
+  const ownOn = !$("ownRow").classList.contains("hide");
+  $("chips").innerHTML = cat.topics.map(t => `<button class="chip">${esc(t)}</button>`).join("") + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own</button>`;
 }
 $("cats").onclick = e => { const b = e.target.closest(".cat"); if (!b) return; catOn = b.dataset.c; paintCats(); };
-$("chips").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; $("topicIn").value = b.textContent; frame(b.textContent); };
+$("chips").onclick = e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  if (b.id === "ownChip") { $("ownRow").classList.remove("hide"); b.classList.add("on"); $("topicIn").focus(); return; }
+  frame(b.textContent);
+};
 $("topicGo").onclick = () => frame($("topicIn").value);
 $("topicIn").onkeydown = e => { if (e.key === "Enter") frame($("topicIn").value); };
 paintCats();
@@ -428,91 +500,131 @@ async function frame(topic){
     const f = await post("/api/debate", { part:"setup", topic, kid:S.kid }, 30000);
     if (!f.ok) {
       s1.className = "status err";
-      s1.innerHTML = esc(f.reason || "Let's pick a different topic.") + (f.title ? ` <button class="chip" id="altBtn" style="margin-left:6px">Try: ${esc(f.title)}</button>` : "");
-      const ab = $("altBtn"); if (ab) ab.onclick = () => { $("topicIn").value = f.title; frame(f.title); };
+      s1.innerHTML = esc(f.reason || "Let's pick a different topic.") + (f.title ? ` <button class="chip" id="altBtn" style="margin-left:6px;min-height:0">Try: ${esc(f.title)}</button>` : "");
+      const ab = $("altBtn"); if (ab) ab.onclick = () => frame(f.title);
       return;
     }
     S.frame = f; s1.textContent = "";
     $("question").textContent = f.title + " — " + f.question;
     $("sideA").innerHTML = esc(f.sideA) + "<small>Side A</small>";
     $("sideB").innerHTML = esc(f.sideB) + "<small>Side B</small>";
-    $("sideA").classList.remove("picked"); $("sideB").classList.remove("picked");
+    ["sideA","sideB","watchBtn"].forEach(id => $(id).classList.remove("picked"));
     $("step2").classList.remove("hide"); $("step3").classList.add("hide");
     $("step2").scrollIntoView({ behavior:"smooth", block:"start" });
-    // Start the research now, while the player picks a side and an opponent.
-    S.facts = []; $("researchMsg").innerHTML = "🔎 Your opponent is researching trusted sources…";
+    // Start the research now, while the player picks a side and the debaters.
+    S.facts = []; $("researchMsg").innerHTML = "🔎 Researching trusted sources…";
     S.researchP = post("/api/debate", { part:"research", title:f.title, category:f.category, sideA:f.sideA, sideB:f.sideB, searches:f.searches }, 60000)
       .then(r => { S.facts = r.facts || []; S.web = !!r.web; S.searched = r.searched || [];
-        $("researchMsg").innerHTML = S.facts.length ? `<b>✓ Research done:</b> ${S.facts.length} facts found${S.web ? " on " + esc(S.searched.slice(0,4).join(", ")) + " and more" : " (from general knowledge)"}.` : "Research came back thin. Your opponent will argue from general knowledge.";
+        $("researchMsg").innerHTML = S.facts.length ? `<b>✓ Research done:</b> ${S.facts.length} facts found${S.web ? " on " + esc(S.searched.slice(0,4).join(", ")) + " and more" : " (from general knowledge)"}.` : "Research came back thin. The debaters will argue from general knowledge.";
         return r; })
-      .catch(() => { $("researchMsg").textContent = "Research had trouble. Your opponent will argue from general knowledge."; return null; });
+      .catch(() => { $("researchMsg").textContent = "Research had trouble. The debaters will argue from general knowledge."; return null; });
   } catch (e) {
     s1.className = "status err"; s1.textContent = e.message || "That didn't go through. Please try again.";
   } finally { $("topicGo").disabled = false; }
 }
 
 // ---------- step 2 ----------
-function pickSide(k){
-  S.userSide = k; S.aiSide = k === "A" ? "B" : "A";
-  $("sideA").classList.toggle("picked", k === "A"); $("sideB").classList.toggle("picked", k === "B");
+function showStep3(){
+  const watch = S.mode === "watch";
+  $("s3title").innerHTML = watch ? "<b>3</b>Pick the debaters" : "<b>3</b>Pick your opponent";
+  $("s3sub").textContent = watch ? "Choose a face and a personality for each side." : "Choose a face, then a personality. Same facts, different attitude.";
+  $("pickOne").classList.toggle("hide", watch); $("pickTwo").classList.toggle("hide", !watch);
+  $("startBtn").textContent = watch ? "Start the debate 🍿" : "Let's debate! 🎤";
+  $("sampleBtn").textContent = watch ? "▶ Hear them" : "▶ Hear a sample";
+  $("pcA").textContent = S.frame.sideA; $("pcB").textContent = S.frame.sideB;
+  paintPickers();
   $("step3").classList.remove("hide");
   $("step3").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+function pickSide(k){
+  S.mode = "play"; S.userSide = k; S.aiSide = other(k);
+  $("sideA").classList.toggle("picked", k === "A"); $("sideB").classList.toggle("picked", k === "B"); $("watchBtn").classList.remove("picked");
+  showStep3();
 }
 $("sideA").onclick = () => pickSide("A");
 $("sideB").onclick = () => pickSide("B");
 $("surprise").onclick = () => pickSide(Math.random() < .5 ? "A" : "B");
+$("watchBtn").onclick = () => { S.mode = "watch"; $("sideA").classList.remove("picked"); $("sideB").classList.remove("picked"); $("watchBtn").classList.add("picked"); showStep3(); };
 
 // ---------- step 3 ----------
-const missing = {};
-// Picture names: young / female / oldman / black, then 1 talk, 2 smug, 3 outraged, 4 laugh, 5 plain
-const FILE = { young:"young", woman:"female", older:"oldman", smooth:"black" };
-const NUM = { talk:1, smug:2, outraged:3, laugh:4, calm:5 };
-const EXTS = ["png","jpg","jpeg","webp","PNG","JPG"];
-function faceSrc(f, ex, e){ return FILE[f] + NUM[ex] + "." + EXTS[e || 0]; }
-// If a picture isn't found as .png, try the other common types before giving up.
-function nextExt(img, f, ex){ const e = (parseInt(img.dataset.e) || 0) + 1; if (e >= EXTS.length) return false; img.dataset.e = e; img.src = faceSrc(f, ex, e); return true; }
-window.dmNextExt = nextExt;
-function paintFaces(){
-  $("faces").innerHTML = Object.entries(FACES).map(([k, f]) =>
-    `<button class="face${k === S.face ? " on" : ""}" data-f="${k}"><div class="pic" style="background:${f.color}">
+function facesHTML(sel){
+  return Object.entries(FACES).map(([k, f]) =>
+    `<button class="face${k === sel ? " on" : ""}" data-f="${k}"><div class="pic" style="background:${f.color}">
       <img src="${faceSrc(k,"calm")}" alt="${esc(f.name)}" onerror="if(!window.dmNextExt(this,'${k}','calm')){this.style.display='none';this.nextElementSibling.style.display='grid'}">
       <div class="fallback" style="display:none">${f.emoji}</div></div>
       <div class="nm">${esc(f.name)}<small>${f.age}</small></div></button>`).join("");
-  $("personas").innerHTML = Object.entries(PERSONAS).map(([k, p]) =>
-    `<button class="persona${k === S.persona ? " on" : ""}" data-p="${k}"><b>${p.label}</b><span>${p.desc}</span></button>`).join("");
 }
-$("faces").onclick = e => { const b = e.target.closest(".face"); if (!b) return; S.face = b.dataset.f; store.set("dm_face", S.face); paintFaces(); };
-$("personas").onclick = e => { const b = e.target.closest(".persona"); if (!b) return; S.persona = b.dataset.p; store.set("dm_persona", S.persona); paintFaces(); };
-paintFaces();
+function personasHTML(sel){
+  return Object.entries(PERSONAS).map(([k, p]) => `<button class="persona${k === sel ? " on" : ""}" data-p="${k}"><b>${p.label}</b><span>${p.desc}</span></button>`).join("");
+}
+function paintPickers(){
+  $("faces").innerHTML = facesHTML(S.face); $("personas").innerHTML = personasHTML(S.persona);
+  ["A","B"].forEach(k => { $("faces" + k).innerHTML = facesHTML(S.deb[k].face); $("personas" + k).innerHTML = personasHTML(S.deb[k].persona); });
+}
+$("faces").onclick = e => { const b = e.target.closest(".face"); if (!b) return; S.face = b.dataset.f; store.set("dm_face", S.face); paintPickers(); };
+$("personas").onclick = e => { const b = e.target.closest(".persona"); if (!b) return; S.persona = b.dataset.p; store.set("dm_persona", S.persona); paintPickers(); };
+["A","B"].forEach(k => {
+  $("faces" + k).onclick = e => {
+    const b = e.target.closest(".face"); if (!b) return;
+    const f = b.dataset.f, o = other(k);
+    if (S.deb[o].face === f) S.deb[o].face = S.deb[k].face; // no twins: swap faces
+    S.deb[k].face = f; store.set("dm_deb", JSON.stringify(S.deb)); paintPickers();
+  };
+  $("personas" + k).onclick = e => { const b = e.target.closest(".persona"); if (!b) return; S.deb[k].persona = b.dataset.p; store.set("dm_deb", JSON.stringify(S.deb)); paintPickers(); };
+});
 $("sampleBtn").onclick = async () => {
   blessVoice();
-  const txt = PERSONAS[S.persona].sample.replace("{n}", nameOf());
-  $("sampleBtn").disabled = true; $("sampleBtn").textContent = "🔊 Loading…";
-  await say(txt, { face:S.face, persona:S.persona, emotion:"smug", quiet:true });
-  $("sampleBtn").disabled = false; $("sampleBtn").textContent = "▶ Hear a sample";
+  const btn = $("sampleBtn"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "🔊 Playing…";
+  if (S.mode === "watch") {
+    for (const k of ["A","B"]) { const d = S.deb[k]; await say(PERSONAS[d.persona].sample.replace("{n}", FACES[d.face].name).replace("you've picked", "they've picked").replace("you'd take", "anyone would take"), { face:d.face, persona:d.persona, quiet:true }); await sleep(250); }
+  } else {
+    await say(PERSONAS[S.persona].sample.replace("{n}", nameOf()), { face:S.face, persona:S.persona, quiet:true });
+  }
+  btn.disabled = false; btn.textContent = label;
 };
-$("startBtn").onclick = () => { if (!S.frame || !S.userSide) return; blessVoice(); startDebate(); };
+$("startBtn").onclick = () => {
+  if (!S.frame) return;
+  blessVoice();
+  if (S.mode === "watch") startWatch(); else { if (!S.userSide) return; startDebate(); }
+};
 
-// ---------- avatar ----------
-let curExpr = "calm";
-function buildAvatar(){
-  const f = FACES[S.face];
-  $("avatar").style.background = `radial-gradient(circle at 50% 30%, ${f.color}66, #1d0d33 72%)`;
-  $("head").innerHTML = EXPRS.map(ex => `<img data-ex="${ex}" src="${faceSrc(S.face, ex)}" alt="">`).join("") +
-    `<div class="fallback hide" id="fb">${f.emoji}<div class="mouth" id="fbMouth"></div></div>`;
-  $("head").querySelectorAll("img").forEach(img => {
-    img.onerror = () => { if (nextExt(img, S.face, img.dataset.ex)) return; missing[img.dataset.ex] = true; if (img.dataset.ex === "calm") $("fb").classList.remove("hide"); setExpr(curExpr); };
+// ---------- avatars ----------
+const AV = {}; let active = null;
+function makeAvatar(face, persona, side){
+  const f = FACES[face];
+  const el = document.createElement("div"); el.className = "avatar";
+  el.style.background = `radial-gradient(circle at 50% 30%, ${f.color}66, #1d0d33 72%)`;
+  el.innerHTML = `<div class="head">${EXPRS.map(ex => `<img data-ex="${ex}" src="${faceSrc(face, ex)}" alt="">`).join("")}<div class="fallback hide">${f.emoji}<div class="mouth"></div></div></div>
+    <div class="spot"></div><div class="plate"><div class="who ${side || ""}">${esc(f.name)}<small>${esc(PERSONAS[persona].label.replace(/^\S+\s/, ""))}</small></div></div>`;
+  const av = { el, head: el.querySelector(".head"), fb: el.querySelector(".fallback"), mouth: el.querySelector(".mouth"), face, persona, missing:{}, cur:"calm" };
+  av.set = ex => {
+    av.cur = ex;
+    let show = ex;
+    if (av.missing[show]) show = (ex === "talk" || ex === "laugh" || ex === "outraged") && !av.missing.talk ? "talk" : "calm";
+    av.head.querySelectorAll("img").forEach(img => img.classList.toggle("show", img.dataset.ex === show && !av.missing[show]));
+    av.mouth.style.height = (ex === "talk" || ex === "laugh" || ex === "outraged") ? "30px" : "10px";
+  };
+  av.head.querySelectorAll("img").forEach(img => {
+    img.onerror = () => { if (nextExt(img, face, img.dataset.ex)) return; av.missing[img.dataset.ex] = true; if (img.dataset.ex === "calm") av.fb.classList.remove("hide"); av.set(av.cur); };
   });
-  $("who").innerHTML = `${esc(f.name)}<small>${esc(PERSONAS[S.persona].label.replace(/^\S+\s/, ""))}</small>`;
-  setExpr("calm");
+  av.set("calm");
+  return av;
 }
-function setExpr(ex){
-  curExpr = ex;
-  let show = ex;
-  if (missing[show]) show = (ex === "talk" || ex === "laugh" || ex === "outraged") && !missing.talk ? "talk" : "calm";
-  $("head").querySelectorAll("img").forEach(img => img.classList.toggle("show", img.dataset.ex === show && !missing[show]));
-  const m = $("fbMouth"); if (m) m.style.height = (ex === "talk" || ex === "laugh" || ex === "outraged") ? "30px" : "10px";
+function buildStage(){
+  const box = $("avs"); box.innerHTML = "";
+  for (const k in AV) delete AV[k];
+  if (S.mode === "watch") {
+    box.classList.add("duo");
+    ["A","B"].forEach(k => { AV[k] = makeAvatar(S.deb[k].face, S.deb[k].persona, k); box.appendChild(AV[k].el); });
+    active = AV.A;
+  } else {
+    box.classList.remove("duo");
+    AV.one = makeAvatar(S.face, S.persona, S.aiSide); box.appendChild(AV.one.el); active = AV.one;
+  }
 }
+function setActive(av){ active = av; if (S.mode === "watch") Object.values(AV).forEach(a => a.el.classList.toggle("live", a === av)); }
+function setExpr(ex){ if (active) active.set(ex); }
 
 // ---------- voice engine (one blessed audio element, routed through an analyser for lip sync) ----------
 const voiceEl = new Audio(); voiceEl.preload = "auto";
@@ -528,25 +640,26 @@ function blessVoice(){
   if (!blessed) { blessed = true; try { voiceEl.src = SILENT; const p = voiceEl.play(); if (p && p.catch) p.catch(() => {}); } catch(e){} }
 }
 let rate = parseFloat(store.get("dm_rate","1")) || 1;
-$("rate").value = rate; $("rateVal").textContent = rate.toFixed(2).replace(/0$/,"") + "×";
-$("rate").oninput = () => {
-  rate = parseFloat($("rate").value); $("rateVal").textContent = rate.toFixed(2).replace(/0$/,"") + "×"; store.set("dm_rate", String(rate));
-  try { voiceEl.playbackRate = rate; } catch(e){}
-};
+const rateLabel = () => rate.toFixed(2).replace(/0$/,"") + "×";
+$("rate").value = rate; $("rateVal").textContent = rateLabel();
+$("rate").oninput = () => { rate = parseFloat($("rate").value); $("rateVal").textContent = rateLabel(); store.set("dm_rate", String(rate)); try { voiceEl.playbackRate = rate; } catch(e){} };
 
 let speaking = false, paused = false, loopId = 0, words = [], useTTS = false, endResolve = null, flapT = null;
 function stopVoice(){
   try { voiceEl.pause(); } catch(e){}
   try { speechSynthesis.cancel(); } catch(e){}
   speaking = false; paused = false; cancelAnimationFrame(loopId); clearInterval(flapT);
-  $("head").style.transform = ""; $("caption").classList.remove("speaking");
+  Object.values(AV).forEach(a => a.head.style.transform = "");
+  $("caption").classList.remove("speaking");
   if (endResolve) { const r = endResolve; endResolve = null; r(); }
   paintCtrls();
 }
+function stopAll(){ S.wtoken++; stopVoice(); }
 function paintCtrls(){
   $("pauseBtn").disabled = !speaking || paused;
   $("contBtn").disabled = !speaking || !paused;
-  $("replayBtn").disabled = !S.last || S.busy;
+  $("replayBtn").disabled = !S.last || S.busy || (S.mode === "watch" && speaking);
+  $("skipBtn").disabled = !speaking;
 }
 function wordsFromAlignment(al, text){
   if (!al || !al.characters) return text.split(/\s+/).filter(Boolean).map(w => ({ w, t:null }));
@@ -558,39 +671,41 @@ function wordsFromAlignment(al, text){
   if (cur) out.push({ w:cur, t:t0 });
   return out;
 }
-function paintCaption(list){
+function paintCaption(list, speaker, side){
   words = list;
-  $("caption").innerHTML = list.map((x, i) => `<span class="w" data-i="${i}">${esc(x.w)}</span>`).join(" ");
+  $("caption").innerHTML = (speaker ? `<span class="spk ${side || ""}">${esc(speaker)}:</span>` : "") + list.map((x, i) => `<span class="w" data-i="${i}">${esc(x.w)}</span>`).join(" ");
 }
 function lightWord(i){
-  const spans = $("caption").querySelectorAll(".w");
-  spans.forEach((s, j) => { s.classList.toggle("done", j < i); s.classList.toggle("on", j === i); });
+  $("caption").querySelectorAll(".w").forEach((s, j) => { s.classList.toggle("done", j < i); s.classList.toggle("on", j === i); });
+}
+async function getVoice(text, face, persona){
+  try { return await post("/api/speak", { text, face, persona }, 30000); } catch(e){ return null; }
 }
 
-// Speak a line: avatar reacts, lips move with the sound, words light up. Resolves when finished.
+// Speak a line: the avatar reacts, lips move with the sound, words light up. Resolves when finished.
 function say(text, opt){
   opt = opt || {};
   return new Promise(async resolve => {
     stopVoice();
-    const quiet = !!opt.quiet; // samples don't take over the caption
-    let data = null;
-    if (opt.cached) data = opt.cached;
-    else {
-      try { data = await post("/api/speak", { text, face: opt.face, persona: opt.persona }, 30000); } catch(e){ data = null; }
-    }
+    const quiet = !!opt.quiet; // samples don't take over the stage
+    const data = opt.cached || await getVoice(text, opt.face, opt.persona);
     const emotion = opt.emotion || "calm";
     if (!quiet) {
-      paintCaption(wordsFromAlignment(data && data.alignment, text));
-      if (emotion !== "calm") { setExpr(emotion); await new Promise(r => setTimeout(r, 750)); }
+      if (opt.av) setActive(opt.av);
+      paintCaption(wordsFromAlignment(data && data.alignment, text), opt.speaker, opt.side);
+      if (emotion !== "calm") { setExpr(emotion); await sleep(750); }
     }
-    endResolve = () => { if (!quiet) { setExpr(emotion === "smug" || emotion === "laugh" ? emotion : "calm"); setTimeout(() => { if (!speaking && curExpr !== "calm") setExpr("calm"); }, 1600); $("caption").classList.remove("speaking"); lightWord(words.length); } resolve(data); };
+    const av = active;
+    endResolve = () => {
+      if (!quiet && av) { av.set(emotion === "smug" || emotion === "laugh" ? emotion : "calm"); setTimeout(() => { if (av.cur !== "calm" && !(speaking && active === av)) av.set("calm"); }, 1600); $("caption").classList.remove("speaking"); lightWord(words.length); }
+      resolve(data);
+    };
     if (data && data.audio) {
       useTTS = false;
-      const url = data.url || URL.createObjectURL(new Blob([Uint8Array.from(atob(data.audio), c => c.charCodeAt(0))], { type:"audio/mpeg" }));
-      data.url = url;
-      voiceEl.src = url; voiceEl.playbackRate = rate;
+      if (!data.url) data.url = URL.createObjectURL(new Blob([Uint8Array.from(atob(data.audio), c => c.charCodeAt(0))], { type:"audio/mpeg" }));
+      voiceEl.src = data.url; voiceEl.playbackRate = rate;
       try { voiceEl.preservesPitch = true; } catch(e){}
-      voiceEl.onended = () => { speaking = false; cancelAnimationFrame(loopId); $("head").style.transform = ""; paintCtrls(); if (endResolve) { const r = endResolve; endResolve = null; r(); } };
+      voiceEl.onended = () => { speaking = false; cancelAnimationFrame(loopId); if (av) av.head.style.transform = ""; paintCtrls(); if (endResolve) { const r = endResolve; endResolve = null; r(); } };
       try {
         if (ctx && ctx.state === "suspended") await ctx.resume();
         await voiceEl.play();
@@ -600,38 +715,37 @@ function say(text, opt){
       }
       speaking = true; paused = false; paintCtrls();
       if (!quiet) $("caption").classList.add("speaking");
-      lipLoop(quiet);
+      lipLoop(quiet, av);
     } else {
       // Fallback: the browser's own voice.
       useTTS = true;
       try {
         const u = new SpeechSynthesisUtterance(text); u.rate = rate;
-        u.onboundary = ev => { if (quiet) return; const before = text.slice(0, ev.charIndex).split(/\s+/).filter(Boolean).length; lightWord(before); };
+        u.onboundary = ev => { if (quiet) return; lightWord(text.slice(0, ev.charIndex).split(/\s+/).filter(Boolean).length); };
         u.onend = () => { speaking = false; clearInterval(flapT); paintCtrls(); if (endResolve) { const r = endResolve; endResolve = null; r(); } };
         speaking = true; paused = false; paintCtrls();
         if (!quiet) $("caption").classList.add("speaking");
-        let open = false; flapT = setInterval(() => { if (paused || quiet) return; open = !open; setExpr(open ? "talk" : "calm"); }, 140);
+        let open = false; flapT = setInterval(() => { if (paused || quiet || !av) return; open = !open; av.set(open ? "talk" : "calm"); }, 140);
         speechSynthesis.speak(u);
       } catch(e) { if (endResolve) { const r = endResolve; endResolve = null; r(); } }
     }
   });
 }
-function lipLoop(quiet){
+function lipLoop(quiet, av){
   const buf = analyser ? new Float32Array(analyser.fftSize) : null;
   let open = false, lastSwitch = 0, level = 0, peak = 0.05;
-  const closed = () => "calm";
   const tick = () => {
     if (!speaking) return;
     const now = performance.now();
     let rms = 0;
     if (analyser && !paused) { analyser.getFloatTimeDomainData(buf); for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / buf.length); }
-    else if (!analyser && !paused) rms = (Math.sin(now / 90) + 1) * 0.04; // no analyser: gentle flap
+    else if (!analyser && !paused) rms = (Math.sin(now / 90) + 1) * 0.04;
     peak = Math.max(peak * 0.995, rms, 0.02);
     level = level * 0.6 + (rms / peak) * 0.4;
-    if (!quiet) {
+    if (!quiet && av) {
       const want = level > 0.42;
-      if (want !== open && now - lastSwitch > 75) { open = want; lastSwitch = now; setExpr(open ? "talk" : closed()); }
-      $("head").style.transform = `translateY(${(-level * 5).toFixed(1)}px) rotate(${(Math.sin(now / 700) * level * 1.6).toFixed(2)}deg) scale(${(1 + level * 0.012).toFixed(3)})`;
+      if (want !== open && now - lastSwitch > 75) { open = want; lastSwitch = now; av.set(open ? "talk" : "calm"); }
+      av.head.style.transform = `translateY(${(-level * 5).toFixed(1)}px) rotate(${(Math.sin(now / 700) * level * 1.6).toFixed(2)}deg) scale(${(1 + level * 0.012).toFixed(3)})`;
       if (!useTTS && words.length) {
         const t = voiceEl.currentTime; let k = -1;
         for (let i = 0; i < words.length; i++) { if (words[i].t != null && words[i].t <= t + 0.03) k = i; else if (words[i].t != null) break; }
@@ -644,17 +758,21 @@ function lipLoop(quiet){
 }
 $("pauseBtn").onclick = () => { if (!speaking) return; paused = true; if (useTTS) speechSynthesis.pause(); else voiceEl.pause(); setExpr("calm"); paintCtrls(); };
 $("contBtn").onclick = () => { if (!speaking) return; paused = false; if (useTTS) speechSynthesis.resume(); else voiceEl.play().catch(() => {}); paintCtrls(); };
-$("replayBtn").onclick = () => { if (!S.last || S.busy) return; say(S.last.text, { face:S.face, persona:S.persona, emotion:S.last.emotion, cached:S.last.data }); };
+$("replayBtn").onclick = () => { const L = S.last; if (!L || S.busy) return; say(L.text, { av:L.av, face:L.face, persona:L.persona, emotion:L.emotion, cached:L.data, speaker:L.speaker, side:L.side }); };
+$("skipBtn").onclick = () => stopVoice();
 
-// ---------- debate ----------
+// ---------- shared arena ----------
+const GOAL = 5;
 function paintTopic(){
   $("tTitle").textContent = S.frame.title;
   $("tQuestion").textContent = S.frame.question;
-  $("badges").innerHTML = `<span class="badge ${S.userSide}">You: ${esc(sideName(S.userSide))}</span><span class="badge ${S.aiSide}">${esc(nameOf())}: ${esc(sideName(S.aiSide))}</span>`;
+  $("badges").innerHTML = S.mode === "watch"
+    ? `<span class="badge A">${esc(debName("A"))}: ${esc(S.frame.sideA)}</span><span class="badge B">${esc(debName("B"))}: ${esc(S.frame.sideB)}</span>`
+    : `<span class="badge ${S.userSide}">You: ${esc(sideName(S.userSide))}</span><span class="badge ${S.aiSide}">${esc(nameOf())}: ${esc(sideName(S.aiSide))}</span>`;
   paintRounds();
 }
-const GOAL = 5;
 function paintRounds(){
+  if (S.mode === "watch") { $("rounds").textContent = S.plan.length ? `Turn ${Math.min(S.wi + 1, S.plan.length)} of ${S.plan.length}` : ""; return; }
   let h = "Round ";
   for (let i = 0; i < GOAL; i++) h += `<i class="${i < S.round ? "done" : ""}"></i>`;
   $("rounds").innerHTML = h;
@@ -666,47 +784,68 @@ function paintFacts(){
   $("factList").innerHTML = S.facts.length ? S.facts.map(f => `<li>${tag(f.side)}: ${esc(f.text)} ${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">(${esc(f.source)})</a>` : `<i>(${esc(f.source)})</i>`}</li>`).join("") : "<li>No research notes this time.</li>";
   $("factFine").textContent = S.web ? "Found by searching trusted sites like " + S.searched.slice(0, 5).join(", ") + ". Click a source to check it yourself." : "These come from general knowledge, not a live web search. Double-check anything important.";
 }
-function logEntry(who, text){
-  const d = document.createElement("div"); d.className = "entry " + who;
-  d.innerHTML = `<b>${who === "ai" ? esc(nameOf()) : "You"}</b>${esc(text)}`;
+function logEntry(cls, who, text){
+  const d = document.createElement("div"); d.className = "entry " + cls;
+  d.innerHTML = `<b>${esc(who)}</b>${esc(text)}`;
   $("logList").appendChild(d);
 }
+function thinking(on, msg){
+  $("thinking").classList.toggle("on", !!on);
+  if (on) $("thinkMsg").textContent = msg || "";
+}
+function addProof(p){ if (p && p.kind && p.kind !== "none") { S.proofs.push(p); S.pIdx = S.proofs.length - 1; paintProof(); } }
+function resetArena(){
+  S.history = []; S.round = 0; S.proofs = []; S.pIdx = -1; S.last = null; S.plan = []; S.wi = 0; S.modQ = null;
+  $("logList").innerHTML = ""; paintProof();
+  $("caption").innerHTML = `<span class="ph">The debate will appear here.</span>`;
+}
+function enterArena(){
+  $("setup").classList.add("hide"); $("arenaWrap").classList.remove("hide"); $("newTopic").classList.remove("hide");
+  window.scrollTo({ top:0, behavior:"smooth" });
+  const watch = S.mode === "watch";
+  $("arena").classList.toggle("watch", watch);
+  $("playMoves").classList.toggle("hide", watch); $("watchMoves").classList.toggle("hide", !watch);
+  $("skipBtn").classList.toggle("hide", !watch);
+  $("challengeProof").dataset.mode = S.mode;
+  $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
+  $("replyHint").textContent = watch ? "Ask both debaters a question anytime. They'll answer after the current turn." : "Type or tap 🎤 and make your case.";
+  $("replyIn").placeholder = watch ? "Ask both debaters a question…" : "Make your argument…";
+  $("sendBtn").textContent = watch ? "Ask ➤" : "Send ➤";
+  buildStage(); resetArena(); paintTopic();
+}
+
+// ---------- PLAY mode: you vs one debater ----------
 function setBusy(b, action){
   S.busy = b;
   ["sendBtn","micBtn","mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof"].forEach(id => $(id).disabled = b);
-  $("thinking").classList.toggle("on", b);
-  if (b) { $("thinkMsg").textContent = (THINK[action] || THINK.reply).replace("{n}", nameOf()); setExpr(action === "reply" || action === "unfair" ? "smug" : "calm"); }
+  thinking(b, (THINK[action] || THINK.reply).replace("{n}", nameOf()));
+  if (b) setExpr(action === "reply" || action === "unfair" ? "smug" : "calm");
   paintCtrls();
 }
-
 async function startDebate(){
-  $("setup").classList.add("hide"); $("arenaWrap").classList.remove("hide"); $("newTopic").classList.remove("hide");
-  window.scrollTo({ top:0, behavior:"smooth" });
-  buildAvatar(); paintTopic();
-  S.history = []; S.round = 0; S.proofs = []; S.pIdx = -1; S.ended = false; $("logList").innerHTML = ""; paintProof();
+  S.mode = "play"; enterArena();
   setBusy(true, "open");
   if (S.researchP) await S.researchP;
   paintFacts();
   await doTurn("open");
 }
-
 async function doTurn(action, userText){
   stopVoice();
   setBusy(true, action);
-  if (window.innerWidth < 900) { const r = $("avatar").getBoundingClientRect(); if (r.bottom < 80 || r.top > window.innerHeight - 120) $("avatar").scrollIntoView({ behavior:"smooth", block:"start" }); }
+  if (window.innerWidth < 900) { const r = $("avs").getBoundingClientRect(); if (r.bottom < 80 || r.top > window.innerHeight - 120) $("avs").scrollIntoView({ behavior:"smooth", block:"start" }); }
   try {
     const r = await post("/api/debate", {
       part:"turn", action, userText: userText || "",
-      title:S.frame.title, question:S.frame.question, sideA:S.frame.sideA, sideB:S.frame.sideB,
+      title:S.frame.title, question:S.frame.question, category:S.frame.category, sideA:S.frame.sideA, sideB:S.frame.sideB,
       aiSide:S.aiSide, persona:S.persona, face:S.face, name:nameOf(), kid:S.kid,
       facts:S.facts, history:S.history, round:S.round || 1
     });
     S.history.push({ who:"ai", text:r.say });
-    logEntry("ai", r.say);
-    if (r.proof && r.proof.kind && r.proof.kind !== "none") { S.proofs.push(r.proof); S.pIdx = S.proofs.length - 1; paintProof(); }
+    logEntry("ai", nameOf(), r.say);
+    addProof(r.proof);
     setBusy(false);
-    S.last = { text:r.say, emotion:r.emotion, data:null };
-    const data = await say(r.say, { face:S.face, persona:S.persona, emotion:r.emotion });
+    S.last = { text:r.say, emotion:r.emotion, data:null, av:AV.one, face:S.face, persona:S.persona };
+    const data = await say(r.say, { av:AV.one, face:S.face, persona:S.persona, emotion:r.emotion });
     if (S.last && S.last.text === r.say) S.last.data = data;
     paintCtrls();
     return r;
@@ -716,12 +855,13 @@ async function doTurn(action, userText){
     return null;
   }
 }
-
 function userSays(text, action){
   text = String(text || "").trim();
-  if (!text || S.busy) return;
+  if (!text) return;
   blessVoice();
-  S.history.push({ who:"user", text }); logEntry("user", text);
+  if (S.mode === "watch") { askModerator(text); return; }
+  if (S.busy) return;
+  S.history.push({ who:"user", text }); logEntry("user", "You", text);
   S.round++; paintRounds();
   $("replyIn").value = "";
   const act = action || S.pending || "reply"; S.pending = null;
@@ -729,35 +869,122 @@ function userSays(text, action){
 }
 $("sendBtn").onclick = () => userSays($("replyIn").value);
 $("replyIn").onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); userSays($("replyIn").value); } };
-$("mProof").onclick = () => { blessVoice(); S.history.push({ who:"user", text:"Show me proof." }); logEntry("user", "Show me proof."); doTurn("proof"); };
+$("mProof").onclick = () => { blessVoice(); S.history.push({ who:"user", text:"Show me proof." }); logEntry("user", "You", "Show me proof."); doTurn("proof"); };
 $("mSource").onclick = () => {
-  blessVoice(); S.history.push({ who:"user", text:"Where's that from?" }); logEntry("user", "Where's that from?");
+  blessVoice(); S.history.push({ who:"user", text:"Where's that from?" }); logEntry("user", "You", "Where's that from?");
   $("pSrcs").classList.remove("flash"); void $("pSrcs").offsetWidth; $("pSrcs").classList.add("flash"); $("notes").open = true;
   doTurn("source");
 };
 $("mUnfair").onclick = () => { S.pending = "unfair"; const t = $("replyIn"); t.value = "That's not fair because "; t.focus(); t.setSelectionRange(t.value.length, t.value.length); $("replyHint").textContent = "Finish the sentence, then tap Send."; };
-$("challengeProof").onclick = () => { if (S.pIdx < 0) return; S.pending = "challenge_proof"; const t = $("replyIn"); t.value = `I challenge Proof #${S.pIdx + 1} because `; t.focus(); t.setSelectionRange(t.value.length, t.value.length); t.scrollIntoView({ behavior:"smooth", block:"center" }); };
+$("challengeProof").onclick = () => {
+  if (S.pIdx < 0) return;
+  const t = $("replyIn");
+  if (S.mode === "watch") { t.value = `About Proof #${S.pIdx + 1}: `; }
+  else { S.pending = "challenge_proof"; t.value = `I challenge Proof #${S.pIdx + 1} because `; }
+  t.focus(); t.setSelectionRange(t.value.length, t.value.length); t.scrollIntoView({ behavior:"smooth", block:"center" });
+};
 $("mSwitch").onclick = () => {
   blessVoice();
   const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; paintTopic();
-  S.history.push({ who:"user", text:"Let's switch sides! Now I argue for " + sideName(S.userSide) + "." }); logEntry("user", "Let's switch sides!");
+  S.history.push({ who:"user", text:"Let's switch sides! Now I argue for " + sideName(S.userSide) + "." }); logEntry("user", "You", "Let's switch sides!");
   doTurn("switch");
 };
 $("mJudge").onclick = async () => {
   if (S.busy) return; blessVoice();
   if (S.round === 0) { toast("Make at least one argument first, then the judge can score it!"); return; }
-  const r = await doTurn("closing");
+  await doTurn("closing");
   showJudge();
 };
+
+// ---------- WATCH mode: two debaters, you moderate ----------
+function watchPlan(){
+  const p = [{ s:"A", a:"open" }, { s:"B", a:"rebut_open" }];
+  for (let i = 0; i < 3; i++) p.push({ s:"A", a:"reply" }, { s:"B", a:"reply" });
+  p.push({ s:"A", a:"closing" }, { s:"B", a:"closing" });
+  return p;
+}
+function histFor(slot){
+  return S.history.map(h => ({ who: h.who === "mod" ? "mod" : (h.who === slot ? "ai" : "user"), text:h.text }));
+}
+async function fetchWatchTurn(step){
+  const d = S.deb[step.s], o = S.deb[other(step.s)];
+  const r = await post("/api/debate", {
+    part:"turn", action:step.a, userText: step.q || "",
+    title:S.frame.title, question:S.frame.question, category:S.frame.category, sideA:S.frame.sideA, sideB:S.frame.sideB,
+    aiSide:step.s, persona:d.persona, face:d.face, name:FACES[d.face].name,
+    opponentName:FACES[o.face].name, opponentPersona:o.persona, kid:S.kid,
+    facts:S.facts, history:histFor(step.s), round: Math.floor(S.wi / 2) + 1
+  });
+  const data = await getVoice(r.say, d.face, d.persona);
+  return { r, data, step };
+}
+async function startWatch(){
+  S.mode = "watch"; enterArena();
+  const token = ++S.wtoken;
+  S.plan = watchPlan(); S.wi = 0; paintRounds();
+  setActive(AV.A);
+  thinking(true, THINK.open.replace("{n}", debName("A")));
+  if (S.researchP) await S.researchP;
+  if (token !== S.wtoken) return;
+  paintFacts();
+  let pending = fetchWatchTurn(S.plan[0]); pending.catch(() => {});
+  let pendingIdx = 0;
+  while (S.wi < S.plan.length) {
+    if (token !== S.wtoken) return;
+    const step = S.plan[S.wi];
+    if (pendingIdx !== S.wi || !pending) { pending = fetchWatchTurn(step); pending.catch(() => {}); pendingIdx = S.wi; }
+    if (!speaking) { setActive(AV[step.s]); thinking(true, (THINK[step.a] || THINK.reply).replace("{n}", debName(step.s))); }
+    let res;
+    try { res = await pending; }
+    catch (e) {
+      if (token !== S.wtoken) return;
+      thinking(false);
+      toast("A debater lost their train of thought. Trying again…");
+      await sleep(1500); pending = null; continue;
+    }
+    if (token !== S.wtoken) return;
+    thinking(false);
+    const name = debName(step.s);
+    S.history.push({ who:step.s, text:res.r.say });
+    logEntry(step.s, name, res.r.say);
+    addProof(res.r.proof);
+    S.wi++; paintRounds();
+    // Start writing the next turn while this one is being spoken.
+    if (S.wi < S.plan.length) { pending = fetchWatchTurn(S.plan[S.wi]); pending.catch(() => {}); pendingIdx = S.wi; } else pending = null;
+    const d = S.deb[step.s];
+    S.last = { text:res.r.say, emotion:res.r.emotion, data:res.data, av:AV[step.s], face:d.face, persona:d.persona, speaker:name, side:step.s };
+    await say(res.r.say, { av:AV[step.s], face:d.face, persona:d.persona, emotion:res.r.emotion, cached:res.data, speaker:name, side:step.s });
+    if (token !== S.wtoken) return;
+    if (S.modQ && S.wi >= 2) {
+      // The moderator asked something (answered once both debaters have opened): both debaters answer it next.
+      const q = S.modQ; S.modQ = null;
+      const first = S.wi < S.plan.length ? S.plan[S.wi].s : other(step.s);
+      S.plan.splice(S.wi, 0, { s:first, a:"moderator", q }, { s:other(first), a:"moderator", q });
+      pending = null; paintRounds();
+    }
+    await sleep(350);
+  }
+  if (token !== S.wtoken) return;
+  showJudge();
+}
+function askModerator(q){
+  if (!S.plan.length || S.wi >= S.plan.length) { toast("The debate is wrapping up. Start a new one to ask more!"); return; }
+  S.history.push({ who:"mod", text:q }); logEntry("mod", "You (moderator)", q);
+  $("replyIn").value = "";
+  S.modQ = q;
+  toast("Great question! Both debaters will answer it next.");
+}
+$("wJudge").onclick = () => { if (!S.history.some(h => h.who === "A" || h.who === "B")) { toast("Let them get started first!"); return; } stopAll(); thinking(false); showJudge(); };
 
 // ---------- mic ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, listening = false;
 if (!SR) $("micBtn").classList.add("hide");
 $("micBtn").onclick = () => {
-  if (!SR || S.busy) return;
+  if (!SR || (S.busy && S.mode !== "watch")) return;
   if (listening) { try { rec.stop(); } catch(e){} return; }
-  stopVoice(); blessVoice();
+  if (S.mode !== "watch") stopVoice();
+  blessVoice();
   rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
   const before = $("replyIn").value;
   rec.onresult = ev => {
@@ -839,20 +1066,26 @@ function chart(p){
   }
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title || "Proof chart")}">${g}</svg>`;
 }
+function pointsHTML(p){
+  return `<div class="pts n${p.rows.length}">${p.rows.map(r => `<div class="pt ${r.side}"><div class="pl">${esc(r.label)}</div><div class="ptx">${esc(r.text)}</div><div class="ps">For ${esc(sideName(r.side))}</div></div>`).join("")}</div>`;
+}
 function paintProof(){
   const n = S.proofs.length, p = S.proofs[S.pIdx];
   $("pPrev").disabled = S.pIdx <= 0; $("pNext").disabled = S.pIdx >= n - 1;
   $("pNum").textContent = n ? `${S.pIdx + 1} of ${n}` : "";
   $("challengeProof").classList.toggle("hide", !p);
+  $("challengeProof").textContent = S.mode === "watch" ? "🙋 Ask about this proof" : "⚡ Challenge this proof";
+  $("screen").classList.toggle("auto", !!p && p.kind === "points");
   if (!p) {
     $("pTitle").innerHTML = "Proof board";
-    $("screen").innerHTML = `<div class="empty">📊 Charts and proof will appear here as your opponent makes their case.</div>`;
+    $("screen").innerHTML = `<div class="empty">📊 Charts and proof will appear here as the case is made.</div>`;
     $("pCap").textContent = ""; $("pCheck").innerHTML = ""; $("pSrcs").innerHTML = ""; return;
   }
   $("pTitle").innerHTML = `Proof #${S.pIdx + 1}<span>${esc(p.title || "")}</span>`;
-  $("screen").innerHTML = chart(p);
-  $("pCap").textContent = p.caption ? `${nameOf()}: "${p.caption}"` : "";
-  $("pCheck").innerHTML = p.checked >= 0.8 ? `<span class="check ok">✓ Numbers match the research</span>`
+  $("screen").innerHTML = p.kind === "points" ? pointsHTML(p) : chart(p);
+  $("pCap").textContent = p.caption ? `"${p.caption}"` : "";
+  if (p.kind === "points") $("pCheck").innerHTML = (p.fact_ids || []).length ? `<span class="check ok">📎 From the research</span>` : `<span class="check warn">⚠ Not tied to a source. Challenge it!</span>`;
+  else $("pCheck").innerHTML = p.checked >= 0.8 ? `<span class="check ok">✓ Numbers match the research</span>`
     : p.checked >= 0.5 ? `<span class="check ok">✓ Mostly matches the research</span>`
     : `<span class="check warn">⚠ Some numbers aren't in the research. Challenge them!</span>`;
   const used = S.facts.filter(f => (p.fact_ids || []).includes(f.id));
@@ -864,24 +1097,35 @@ function paintProof(){
 // ---------- judge ----------
 async function showJudge(){
   stopVoice();
+  const watch = S.mode === "watch";
   $("judgeOv").classList.add("on");
   $("judgeBody").innerHTML = `<div class="verdict">The judge is reviewing the tape… <div class="dots"><span></span><span></span><span></span></div></div>`;
   try {
-    const j = await post("/api/debate", { part:"judge", title:S.frame.title, name:nameOf(), kid:S.kid, history:S.history }, 60000);
+    const body = watch
+      ? { part:"judge", title:S.frame.title, nameA:debName("A"), nameB:debName("B"), sideA:S.frame.sideA, sideB:S.frame.sideB, kid:S.kid, history:S.history }
+      : { part:"judge", title:S.frame.title, name:nameOf(), kid:S.kid, history:S.history };
+    const j = await post("/api/debate", body, 60000);
     const ty = j.you.evidence + j.you.logic + j.you.style, ta = j.ai.evidence + j.ai.logic + j.ai.style;
-    const banner = j.winner === "you" ? "🏆 YOU WIN!" : j.winner === "ai" ? `🏆 ${esc(nameOf())} wins!` : "🤝 It's a tie!";
+    const n1 = watch ? debName("A") : "You", n2 = watch ? debName("B") : nameOf();
+    const s1 = watch ? S.frame.sideA : sideName(S.userSide), s2 = watch ? S.frame.sideB : sideName(S.aiSide);
+    const banner = j.winner === "tie" ? "🤝 It's a tie!" : j.winner === "you" ? (watch ? `🏆 ${esc(n1)} wins!` : "🏆 YOU WIN!") : `🏆 ${esc(n2)} wins!`;
     const col = (title, sc, tot) => `<div class="sc"><h4>${title}</h4>${["evidence","logic","style"].map(k => `<div class="row"><span>${k[0].toUpperCase() + k.slice(1)}</span><div class="bar"><i data-w="${sc[k] * 10}"></i></div><span>${sc[k]}</span></div>`).join("")}<div class="tot">Total: ${tot} / 30</div></div>`;
     $("judgeBody").innerHTML = `<div class="banner">${banner}</div><p class="verdict">${esc(j.verdict)}</p>
-      <div class="scores">${col("You (" + esc(sideName(S.userSide)) + ")", j.you, ty)}${col(esc(nameOf()) + " (" + esc(sideName(S.aiSide)) + ")", j.ai, ta)}</div>
-      <div class="moments"><p>⭐ <b>Your best moment:</b> ${esc(j.best_you)}</p><p>🎯 <b>${esc(nameOf())}'s best moment:</b> ${esc(j.best_ai)}</p><p>💡 <b>Tip for next time:</b> ${esc(j.tip)}</p></div>
-      <div class="jbtns"><button class="go" id="rematch">🔄 Rematch, switch sides</button><button class="pill" id="newOpp">🎭 New opponent</button><button class="pill" id="backDebate">↩ Keep debating</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
+      <div class="scores">${col(esc(n1) + " (" + esc(s1) + ")", j.you, ty)}${col(esc(n2) + " (" + esc(s2) + ")", j.ai, ta)}</div>
+      <div class="moments"><p>⭐ <b>${watch ? esc(n1) + "'s" : "Your"} best moment:</b> ${esc(j.best_you)}</p><p>🎯 <b>${esc(n2)}'s best moment:</b> ${esc(j.best_ai)}</p><p>💡 <b>${watch ? "Takeaway" : "Tip for next time"}:</b> ${esc(j.tip)}</p></div>
+      <div class="jbtns"><button class="go" id="rematch">🔄 ${watch ? "Run it back, swap sides" : "Rematch, switch sides"}</button><button class="pill" id="newOpp">🎭 ${watch ? "New debaters" : "New opponent"}</button><button class="pill" id="backDebate">↩ Back to the debate</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
     setTimeout(() => $("judgeBody").querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.w + "%"), 60);
-    if (j.winner === "you") confetti();
-    $("rematch").onclick = () => { $("judgeOv").classList.remove("on"); const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; startDebate(); };
-    $("newOpp").onclick = () => { stopVoice(); $("judgeOv").classList.remove("on"); $("arenaWrap").classList.add("hide"); $("setup").classList.remove("hide"); $("step3").scrollIntoView({ behavior:"smooth" }); };
+    if (j.winner === "you" && !watch) confetti();
+    if (watch && j.winner !== "tie") confetti();
+    $("rematch").onclick = () => {
+      $("judgeOv").classList.remove("on"); stopAll();
+      if (watch) { const t = S.deb.A; S.deb.A = S.deb.B; S.deb.B = t; startWatch(); }
+      else { const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; startDebate(); }
+    };
+    $("newOpp").onclick = () => { stopAll(); $("judgeOv").classList.remove("on"); $("arenaWrap").classList.add("hide"); $("setup").classList.remove("hide"); showStep3(); };
     $("backDebate").onclick = () => { stopVoice(); $("judgeOv").classList.remove("on"); };
-    $("jNew").onclick = () => { stopVoice(); location.replace(location.pathname); };
-    say(j.verdict, { face:"judge", persona:"judge", emotion:"calm", quiet:true });
+    $("jNew").onclick = () => { stopAll(); location.replace(location.pathname); };
+    say(j.verdict, { face:"judge", persona:"judge", quiet:true });
   } catch (e) {
     $("judgeBody").innerHTML = `<p class="verdict">The judge couldn't make it. Please try again.</p><div class="jbtns"><button class="go" id="jRetry">Try again</button><button class="pill" id="jClose">Close</button></div>`;
     $("jRetry").onclick = showJudge; $("jClose").onclick = () => $("judgeOv").classList.remove("on");
