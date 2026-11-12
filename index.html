@@ -757,7 +757,7 @@ function lipLoop(quiet, av){
   loopId = requestAnimationFrame(tick);
 }
 $("pauseBtn").onclick = () => { if (!speaking) return; paused = true; if (useTTS) speechSynthesis.pause(); else voiceEl.pause(); setExpr("calm"); paintCtrls(); };
-$("contBtn").onclick = () => { if (!speaking) return; paused = false; if (useTTS) speechSynthesis.resume(); else voiceEl.play().catch(() => {}); paintCtrls(); };
+$("contBtn").onclick = () => { if (!speaking) return; modHold = false; paused = false; if (useTTS) speechSynthesis.resume(); else voiceEl.play().catch(() => {}); paintCtrls(); };
 $("replayBtn").onclick = () => { const L = S.last; if (!L || S.busy) return; say(L.text, { av:L.av, face:L.face, persona:L.persona, emotion:L.emotion, cached:L.data, speaker:L.speaker, side:L.side }); };
 $("skipBtn").onclick = () => stopVoice();
 
@@ -808,8 +808,8 @@ function enterArena(){
   $("skipBtn").classList.toggle("hide", !watch);
   $("challengeProof").dataset.mode = S.mode;
   $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
-  $("replyHint").textContent = watch ? "Ask both debaters a question anytime. They'll answer after the current turn." : "Type or tap 🎤 and make your case.";
-  $("replyIn").placeholder = watch ? "Ask both debaters a question…" : "Make your argument…";
+  $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case.";
+  $("replyIn").placeholder = watch ? "Ask a question or make a point…" : "Make your argument…";
   $("sendBtn").textContent = watch ? "Ask ➤" : "Send ➤";
   buildStage(); resetArena(); paintTopic();
 }
@@ -972,9 +972,25 @@ function askModerator(q){
   S.history.push({ who:"mod", text:q }); logEntry("mod", "You (moderator)", q);
   $("replyIn").value = "";
   S.modQ = q;
-  toast("Great question! Both debaters will answer it next.");
+  $("replyIn").blur(); releaseModerator();
+  toast("Got it! Both debaters will answer you next.");
 }
 $("wJudge").onclick = () => { if (!S.history.some(h => h.who === "A" || h.who === "B")) { toast("Let them get started first!"); return; } stopAll(); thinking(false); showJudge(); };
+
+// Moderator mode: the debater pauses while you talk or type, then picks back up.
+let modHold = false;
+function holdForModerator(){
+  if (S.mode !== "watch" || !speaking || paused) return;
+  modHold = true; paused = true; if (useTTS) speechSynthesis.pause(); else voiceEl.pause(); setExpr("calm"); paintCtrls();
+  $("replyHint").textContent = "⏸ Paused so you can jump in. Ask, or tap ▶ Continue.";
+}
+function releaseModerator(){
+  if (!modHold) return; modHold = false;
+  $("replyHint").textContent = "Ask both debaters a question or make a point. They'll answer it next.";
+  if (speaking && paused) { paused = false; if (useTTS) speechSynthesis.resume(); else voiceEl.play().catch(() => {}); paintCtrls(); }
+}
+$("replyIn").addEventListener("focus", () => holdForModerator());
+$("replyIn").addEventListener("blur", () => { if (!$("replyIn").value.trim()) setTimeout(releaseModerator, 150); });
 
 // ---------- mic ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -983,7 +999,7 @@ if (!SR) $("micBtn").classList.add("hide");
 $("micBtn").onclick = () => {
   if (!SR || (S.busy && S.mode !== "watch")) return;
   if (listening) { try { rec.stop(); } catch(e){} return; }
-  if (S.mode !== "watch") stopVoice();
+  if (S.mode !== "watch") stopVoice(); else holdForModerator();
   blessVoice();
   rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
   const before = $("replyIn").value;
@@ -993,8 +1009,8 @@ $("micBtn").onclick = () => {
     $("replyIn").value = (before ? before + " " : "") + txt;
     if (final) { try { rec.stop(); } catch(e){} }
   };
-  rec.onend = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; if ($("replyIn").value.trim() && $("replyIn").value.trim() !== before.trim()) userSays($("replyIn").value); };
-  rec.onerror = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; };
+  rec.onend = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; if ($("replyIn").value.trim() && $("replyIn").value.trim() !== before.trim()) userSays($("replyIn").value); else releaseModerator(); };
+  rec.onerror = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; releaseModerator(); };
   try { rec.start(); listening = true; $("micBtn").classList.add("listening"); $("micBtn").textContent = "■"; } catch(e){}
 };
 
@@ -1139,6 +1155,15 @@ function confetti(){
     d.style.animationDuration = (2.2 + Math.random() * 2) + "s"; d.style.animationDelay = Math.random() * .8 + "s";
     document.body.appendChild(d); setTimeout(() => d.remove(), 5200);
   }
+}
+// When embedded on a website, tell the page how tall the tool is, so there's no empty space.
+if (window.parent !== window) {
+  let lastH = 0;
+  const sendH = () => { const h = Math.ceil(document.querySelector(".wrap").getBoundingClientRect().height) + 20; if (Math.abs(h - lastH) > 4) { lastH = h; try { window.parent.postMessage({ debateMeHeight: h }, "*"); } catch(e){} } };
+  try { new ResizeObserver(sendH).observe(document.querySelector(".wrap")); } catch(e){ setInterval(sendH, 800); }
+  window.addEventListener("load", sendH); sendH();
+  // The judge's scorecard pops up over the page: make sure it's in view.
+  try { new MutationObserver(() => { if ($("judgeOv").classList.contains("on")) window.parent.postMessage({ debateMeScroll: true }, "*"); }).observe($("judgeOv"), { attributes:true, attributeFilter:["class"] }); } catch(e){}
 }
 })();
 </script>
