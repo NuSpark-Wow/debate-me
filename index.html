@@ -312,6 +312,24 @@ a{color:var(--gold)}
 .pt .pl{font-size:12.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
 .pt .ptx{font-size:15.5px;line-height:1.45;font-weight:600}
 .pt .ps{font-size:12.5px;font-weight:800;margin-top:7px;color:var(--a)}.pt.B .ps{color:var(--b)}
+/* ---- welcome stage: the four debaters ---- */
+.stage{position:relative;border-radius:18px;overflow:hidden;margin-bottom:16px;padding:18px 14px 0;
+  background:radial-gradient(ellipse at 50% -10%,rgba(255,201,74,.28),transparent 55%),linear-gradient(180deg,#3a1d63,#1f0f38 78%);
+  border:1px solid rgba(255,201,74,.25);box-shadow:inset 0 -30px 40px rgba(0,0,0,.35)}
+.stage:before,.stage:after{content:"";position:absolute;top:0;bottom:0;width:26px;background:repeating-linear-gradient(90deg,#7a1f3d 0 6px,#5c1530 6px 12px);opacity:.85}
+.stage:before{left:0}.stage:after{right:0}
+.stage .tag{text-align:center;color:#ffc94a;font-weight:800;letter-spacing:.06em;font-size:13px;text-transform:uppercase;margin:0 30px 8px}
+.stage .line{display:grid;grid-template-columns:repeat(4,minmax(0,140px));justify-content:center;gap:clamp(8px,4vw,36px);margin:0 30px;align-items:end}
+.stage .deb{text-align:center}
+.stage .pic{position:relative;aspect-ratio:1/1;border-radius:50%;overflow:hidden;border:3px solid var(--c);background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 4px rgba(0,0,0,.25),0 8px 20px rgba(0,0,0,.4);animation:dmBob 3.2s ease-in-out infinite;animation-delay:var(--d)}
+.stage .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s}
+.stage .pic .fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px}
+.stage .nm{margin-top:6px;font-weight:800;font-size:14px;color:#fff}
+.stage .floor{height:16px;margin:10px -14px 0;background:linear-gradient(180deg,#5a3a1c,#3b2410);border-top:2px solid #8a5a2c}
+@keyframes dmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media (prefers-reduced-motion:reduce){.stage .pic{animation:none}}
+@media (max-width:560px){.stage .line{gap:5px;margin:0 22px}.stage:before,.stage:after{width:16px}.stage .nm{font-size:12px}.stage .tag{font-size:11.5px;margin:0 20px 6px}.stage .pic .fb{font-size:28px}}
 @media (max-width:560px){.rrow{flex-wrap:wrap}.rrow textarea{flex-basis:100%;order:-1}.mic{height:54px}.send{flex:1;height:54px}.avs.duo .plate{left:6px;right:6px;bottom:6px}.avs.duo .plate .who{font-size:12.5px;padding:4px 8px}.avs.duo .plate .who small{display:none}}
 @media (max-width:700px){.pick2{grid-template-columns:1fr}.pts{grid-template-columns:1fr}.arena.watch{grid-template-columns:1fr}.avs.duo .avatar .fallback{font-size:56px}}
 </style>
@@ -331,6 +349,11 @@ a{color:var(--gold)}
 
   <!-- ===== SETUP ===== -->
   <section id="setup">
+    <div class="stage" id="stage" aria-label="The four debaters">
+      <div class="tag">Your opponents are warming up</div>
+      <div class="line" id="stageLine"></div>
+      <div class="floor"></div>
+    </div>
     <div class="step" id="step1">
       <h2><b>1</b>Pick a fight</h2>
       <p class="sub">Choose a classic debate, or type your own.</p>
@@ -549,6 +572,32 @@ const EXTS = ["png","jpg","jpeg","webp","PNG","JPG"];
 function faceSrc(f, ex, e){ return FILE[f] + NUM[ex] + "." + EXTS[e || 0]; }
 function nextExt(img, f, ex){ const e = (parseInt(img.dataset.e) || 0) + 1; if (e >= EXTS.length) return false; img.dataset.e = e; img.src = faceSrc(f, ex, e); return true; }
 window.dmNextExt = nextExt;
+
+// ---------- welcome stage: the four debaters, swapping expressions now and then ----------
+(function(){
+  const line = document.getElementById("stageLine"); if (!line) return;
+  const order = ["young","woman","older","smooth"], start = ["smug","laugh","outraged","talk"], moods = ["talk","smug","outraged","laugh","calm"];
+  const imgs = order.map((f, i) => {
+    const d = document.createElement("div"); d.className = "deb";
+    d.innerHTML = '<div class="pic" style="--c:' + FACES[f].color + ';--d:' + (i * 0.4) + 's"><div class="fb">' + FACES[f].emoji + '</div><img alt="' + FACES[f].name + '"></div><div class="nm">' + FACES[f].name + '</div>';
+    line.appendChild(d);
+    const img = d.querySelector("img");
+    img.dataset.f = f; img.dataset.ex = start[i]; img.dataset.e = 0;
+    img.onerror = () => { if (!nextExt(img, img.dataset.f, img.dataset.ex)) img.style.display = "none"; };
+    img.src = faceSrc(f, start[i]);
+    return img;
+  });
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let k = 0;
+  setInterval(() => {
+    const stage = document.getElementById("stage");
+    if (!stage || stage.offsetParent === null || document.hidden) return;
+    const img = imgs[k++ % imgs.length], cur = img.dataset.ex;
+    const pick = moods.filter(m => m !== cur)[Math.floor(Math.random() * 4)];
+    img.style.opacity = 0;
+    setTimeout(() => { img.dataset.ex = pick; img.dataset.e = 0; img.src = faceSrc(img.dataset.f, pick); img.style.opacity = 1; }, 300);
+  }, 1800);
+})();
 
 // ---------- state ----------
 let savedDeb = null; try { savedDeb = JSON.parse(store.get("dm_deb", "null")); } catch(e){}
