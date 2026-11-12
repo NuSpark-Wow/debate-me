@@ -45,7 +45,7 @@ a{color:var(--gold)}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 .chip small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--a);margin-bottom:4px}
 .chip.q small{color:var(--b)}
-.chip.ownc{grid-column:1/-1;min-height:54px}
+.chip.ownc{min-height:54px}
 .chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15.5px;text-align:left;min-height:68px;line-height:1.25}
 .chip.ownc{border:2px dashed var(--gold);background:transparent;color:var(--gold);text-align:center}
 .chip.ownc.on{background:rgba(255,201,74,.12)}
@@ -209,7 +209,7 @@ a{color:var(--gold)}
 .notice{margin-top:20px;font-size:13px;color:var(--soft);text-align:center;line-height:1.5}
 
 @media (max-width:900px){.arena{grid-template-columns:1fr}.stage{max-width:520px;margin:0 auto;width:100%}}
-@media (max-width:700px){.chips{grid-template-columns:1fr 1fr}.chip.ownc{grid-column:1/-1;min-height:54px}.faces{grid-template-columns:repeat(2,1fr)}.personas{grid-template-columns:1fr 1fr}.sides{grid-template-columns:1fr}.vs{text-align:center}.own{flex-wrap:wrap}.own .go{width:100%}.scores{grid-template-columns:1fr}.rategrp{margin-left:0}}
+@media (max-width:700px){.chips{grid-template-columns:1fr 1fr}.faces{grid-template-columns:repeat(2,1fr)}.personas{grid-template-columns:1fr 1fr}.sides{grid-template-columns:1fr}.vs{text-align:center}.own{flex-wrap:wrap}.own .go{width:100%}.scores{grid-template-columns:1fr}.rategrp{margin-left:0}}
 @media (max-width:420px){.personas{grid-template-columns:1fr}}
 
 /* swap a side / yes-no */
@@ -226,6 +226,51 @@ a{color:var(--gold)}
 .yn{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14.5px}
 .yn:hover{border-color:var(--gold)}
 @media (max-width:700px){.edits{grid-template-columns:1fr 1fr}.edits span{display:none}}
+/* debate the attached */
+.chip.atc{border:2px dashed var(--a);background:transparent;color:#b9dcff;text-align:center;min-height:54px}
+.chip.atc.on{background:rgba(78,168,255,.12)}
+.chip.rk small{color:var(--gold)}
+.attachbox{background:var(--bg2);border-radius:16px;padding:14px;margin:4px 0}
+.atlab{font-weight:800;margin-bottom:10px}
+.atbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.atprev{display:flex;align-items:center;gap:12px;background:#170a2a;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;font-weight:700}
+.atprev img{max-height:110px;max-width:160px;border-radius:8px}
+.atprev button{margin-left:auto}
+.attext{width:100%;min-height:120px;border:2px solid var(--line);border-radius:14px;background:#170a2a;color:var(--ink);padding:12px 14px;font-size:16px;font-family:inherit;outline:none;margin-bottom:10px;resize:vertical}
+.srcline{margin:6px auto 4px;max-width:760px;text-align:center;background:rgba(78,168,255,.1);border-radius:12px;padding:8px 12px;font-weight:700;font-size:14.5px;color:#cfe6ff}
+/* ranking lists */
+.lists{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.lcol{background:var(--bg2);border-radius:16px;padding:14px;border-top:5px solid var(--a)}
+.lcol.mine{border-top-color:var(--b)}
+.lcol h3{margin:0 0 10px;font-size:16px}
+.lcol h3 small{color:var(--soft);font-weight:600;font-size:12.5px;margin-left:6px}
+.lcol ol{margin:0;padding:0;list-style:none;counter-reset:r}
+.lcol li{counter-increment:r;display:flex;align-items:center;gap:8px;background:#170a2a;border-radius:10px;padding:8px 10px;margin-bottom:6px;font-weight:700;font-size:15.5px}
+.lcol li::before{content:counter(r);min-width:26px;height:26px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-size:13px;color:var(--gold)}
+.lcol li .nm{flex:1}
+.lcol li .why{display:block;font-weight:600;font-size:12.5px;color:var(--soft)}
+.lcol li button{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:8px;width:30px;height:30px;font-weight:800;padding:0}
+.lcol li button:disabled{opacity:.3}
+.lcol .wait{color:var(--soft);font-weight:700;padding:8px 2px}
+.addrow{display:flex;gap:8px;margin-top:8px}
+.addrow input{flex:1;min-width:0;height:44px;border:2px solid var(--line);border-radius:12px;background:#170a2a;color:var(--ink);padding:0 12px;font-size:15px;font-family:inherit;outline:none}
+.rbtns{display:flex;margin-top:14px}
+.tg{font-size:11.5px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.tg.same{background:rgba(60,207,142,.15);color:var(--green)}
+.tg.up{background:rgba(78,168,255,.15);color:#9fd0ff}
+.tg.down{background:rgba(255,138,61,.15);color:#ffb37f}
+.tg.only{background:rgba(255,201,74,.18);color:var(--gold)}
+.lv{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.lv h4{margin:0 0 8px;font-size:14px}
+.lv .A h4{color:var(--a)}.lv .B h4{color:var(--b)}
+.lv ol{list-style:none;margin:0;padding:0}
+.lv li{display:flex;align-items:center;gap:6px;background:#1d0f33;border-radius:8px;padding:6px 8px;margin-bottom:5px;font-weight:700;font-size:14px}
+.lv li b{color:var(--gold);min-width:20px}
+.lv li span.n{flex:1}
+.complist{margin:0 0 14px;padding:12px 14px;background:var(--bg2);border-radius:14px}
+.complist h4{margin:0 0 8px}
+.complist ol{margin:0;padding-left:22px;line-height:1.6;font-weight:700}
+@media (max-width:700px){.lists{grid-template-columns:1fr}.lv{grid-template-columns:1fr}}
 /* type your own */
 .ownbox{margin-bottom:4px}
 /* watch mode */
@@ -295,12 +340,26 @@ a{color:var(--gold)}
         <input id="topicIn" maxlength="200" placeholder="e.g. Beatles vs Stones" autocomplete="off">
         <button class="go" id="topicGo">Let's go ▶</button>
       </div>
+      <div class="attachbox hide" id="attachRow">
+        <div class="atlab">📎 Debate the attached: a list, article, post or screenshot</div>
+        <div class="atbtns">
+          <button class="pill" id="atPhoto">📸 Photo or screenshot</button>
+          <button class="pill" id="atFile">📄 File (PDF, Word, text)</button>
+          <button class="pill" id="atPaste">📋 Paste text</button>
+        </div>
+        <input type="file" id="atImg" accept="image/*" class="hide">
+        <input type="file" id="atDoc" accept=".pdf,.txt,.md,.doc,.docx,application/pdf,text/plain" class="hide">
+        <div class="atprev hide" id="atPreview"></div>
+        <textarea class="attext hide" id="atText" placeholder="Paste the post, article or list here…"></textarea>
+        <div class="own"><input id="atNote" maxlength="200" placeholder="Optional: what should we debate about it?" autocomplete="off"><button class="go" id="atGo">Debate this ▶</button></div>
+      </div>
       <div class="status" id="s1"></div>
     </div>
 
     <div class="step hide" id="step2">
       <h2><b>2</b>Pick your side</h2>
       <div class="matchup"><div class="q" id="question"></div></div>
+      <div class="srcline hide" id="srcLine"></div>
       <div class="sides">
         <button class="side A" id="sideA"></button>
         <div class="vs">VS</div>
@@ -321,6 +380,21 @@ a{color:var(--gold)}
       <button class="surprise" id="surprise">🎲 You pick for me</button>
       <div class="or">— OR —</div>
       <button class="watchbtn" id="watchBtn">🍿 Watch two debaters argue it out<small>Pick both debaters, sit back, and jump in as the moderator.</small></button>
+    </div>
+
+    <div class="step hide" id="step2r">
+      <h2><b>2</b>Build your list</h2>
+      <div class="matchup"><div class="q" id="rQuestion"></div></div>
+      <div class="srcline hide" id="rSrcLine"></div>
+      <div class="lists">
+        <div class="lcol"><h3 id="rLeftTitle">The list</h3><ol id="rLeft"></ol></div>
+        <div class="lcol mine"><h3>Your list <small>▲▼ move · ✕ remove</small></h3><ol id="rMine"></ol>
+          <div class="addrow"><input id="rAdd" maxlength="60" placeholder="➕ Add someone missing" autocomplete="off"><button class="pill" id="rAddGo">Add</button></div>
+        </div>
+      </div>
+      <div class="rbtns"><button class="go big" id="rPlay">🎤 Debate my list</button></div>
+      <div class="or">— OR —</div>
+      <button class="watchbtn" id="rWatch">🍿 Watch two debaters argue over it<small>One defends the list, the other brings a challenger list. You moderate.</small></button>
     </div>
 
     <div class="step hide" id="step3">
@@ -396,7 +470,10 @@ a{color:var(--gold)}
         <button class="move" id="mProof">📊 Show me proof</button>
         <button class="move" id="mSource">🔎 Where's that from?</button>
         <button class="move" id="mUnfair">✋ That's not fair because…</button>
-        <button class="move" id="mSwitch">🔄 Switch sides</button>
+        <button class="move hide rk" id="mMissing">🔎 Who's missing?</button>
+        <button class="move hide rk" id="mShouldnt">🚫 Who shouldn't be there?</button>
+        <button class="move hide rk" id="mNumberOne">👑 Why is #1 #1?</button>
+        <button class="move nrk" id="mSwitch">🔄 Switch sides</button>
         <button class="move judge" id="mJudge">🏆 End &amp; judge</button>
       </div>
       <div class="moves hide" id="watchMoves">
@@ -429,21 +506,21 @@ const store = { get(k, d){ try { const v = localStorage.getItem(k); return v == 
 // ---------- data ----------
 const CATS = [
   { id:"sports", label:"⚾ Sports", vs:["Michael Jordan vs LeBron James","Babe Ruth vs Willie Mays","Tom Brady vs Joe Montana","Yankees vs Red Sox"],
-    q:["Who's the best 3rd baseman of all time?","Should Pete Rose be in the Hall of Fame?","Is the designated hitter good for baseball?","Are today's athletes better than the legends?"] },
+    q:["Who's the best 3rd baseman of all time?","Should Pete Rose be in the Hall of Fame?","Is the designated hitter good for baseball?","Are today's athletes better than the legends?"], rank:["Top 10 third basemen of all time","Top 5 NBA players ever"] },
   { id:"music", label:"🎵 Music", vs:["Prince vs Michael Jackson","The Beatles vs The Rolling Stones","Elvis vs Frank Sinatra","Vinyl vs streaming"],
-    q:["Who is the greatest singer of all time?","Were the '80s the best decade for music?","Do the Grammys still matter?","Is today's music as good as the classics?"] },
+    q:["Who is the greatest singer of all time?","Were the '80s the best decade for music?","Do the Grammys still matter?","Is today's music as good as the classics?"], rank:["Top 10 rock bands of all time","Top 5 Motown singers"] },
   { id:"movies", label:"🎬 Movies & TV", vs:["Star Trek vs Star Wars","Friends vs Seinfeld","Al Pacino vs Robert De Niro","The Godfather vs The Godfather Part II"],
-    q:["What's the greatest movie of all time?","Is a remake ever better than the original?","Is streaming better than going to the movies?","Was TV better in the '90s?"] },
+    q:["What's the greatest movie of all time?","Is a remake ever better than the original?","Is streaming better than going to the movies?","Was TV better in the '90s?"], rank:["Top 10 movies of all time","Top 5 sitcoms ever"] },
   { id:"history", label:"🏛️ History", vs:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson"],
-    q:["What was the greatest invention ever?","Who was the most important Founding Father?","Was the moon landing America's greatest achievement?","Which century changed the world the most?"] },
+    q:["What was the greatest invention ever?","Who was the most important Founding Father?","Was the moon landing America's greatest achievement?","Which century changed the world the most?"], rank:["Top 5 U.S. presidents","Top 10 inventions that changed the world"] },
   { id:"food", label:"🍔 Food & Health", vs:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Butter vs margarine"],
-    q:["Is breakfast the most important meal?","Does pineapple belong on pizza?","Is a little chocolate good for you?","Is organic food worth the price?"] },
+    q:["Is breakfast the most important meal?","Does pineapple belong on pizza?","Is a little chocolate good for you?","Is organic food worth the price?"], rank:["Top 5 pizza toppings","Top 10 healthiest foods"] },
   { id:"home", label:"🏠 Home & Life", vs:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets"],
-    q:["Is working from home better than the office?","Should you make your bed every day?","Is it okay to recline your airplane seat?","Are smartphones making life better?"] },
+    q:["Is working from home better than the office?","Should you make your bed every day?","Is it okay to recline your airplane seat?","Are smartphones making life better?"], rank:["Top 5 dog breeds for families","Top 5 home upgrades worth the money"] },
   { id:"toys", label:"🧸 Toys & Pop Culture", vs:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation"],
-    q:["What's the greatest toy of all time?","Are video games good for kids?","Were Saturday-morning cartoons the best TV ever?","Are superhero movies getting old?"] },
+    q:["What's the greatest toy of all time?","Are video games good for kids?","Were Saturday-morning cartoons the best TV ever?","Are superhero movies getting old?"], rank:["Top 10 toys of all time","Top 5 video game consoles"] },
   { id:"other", label:"✨ Other", vs:["Picasso vs Van Gogh","Books vs movies","Morning person vs night owl","Beach vacation vs mountain vacation"],
-    q:["Is a hot dog a sandwich?","Is photography real art?","Is cursive still worth learning?","Should daylight saving time end?"] }
+    q:["Is a hot dog a sandwich?","Is photography real art?","Is cursive still worth learning?","Should daylight saving time end?"], rank:["Top 10 painters of all time","Top 5 U.S. vacation spots"] }
 ];
 const FACES = {
   young:  { name:"Jake",   age:"30s", emoji:"🧢", color:"#2bb3b1" },
@@ -517,27 +594,85 @@ function paintCats(){
   const ownOn = !$("ownRow").classList.contains("hide");
   $("chips").innerHTML = cat.vs.map(t => `<button class="chip"><small>⚔️ Head to head</small>${esc(t)}</button>`).join("")
     + cat.q.map(t => `<button class="chip q"><small>❓ Big question</small>${esc(t)}</button>`).join("")
-    + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own topic</button>`;
+    + (cat.rank || []).map(t => `<button class="chip rk"><small>🏆 Top list</small>${esc(t)}</button>`).join("")
+    + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own topic</button>`
+    + `<button class="chip atc${$("attachRow").classList.contains("hide") ? "" : " on"}" id="atChip">📎 Debate the attached</button>`;
 }
 $("cats").onclick = e => { const b = e.target.closest(".cat"); if (!b) return; catOn = b.dataset.c; paintCats(); };
 $("chips").onclick = e => {
   const b = e.target.closest(".chip"); if (!b) return;
-  if (b.id === "ownChip") { $("ownRow").classList.remove("hide"); b.classList.add("on"); $("topicIn").focus(); return; }
+  if (b.id === "ownChip") { $("ownRow").classList.remove("hide"); $("attachRow").classList.add("hide"); paintCats(); $("topicIn").focus(); return; }
+  if (b.id === "atChip") { $("attachRow").classList.remove("hide"); $("ownRow").classList.add("hide"); paintCats(); $("attachRow").scrollIntoView({ behavior:"smooth", block:"center" }); return; }
   frame(b.lastChild.textContent);
 };
 $("topicGo").onclick = () => frame($("topicIn").value);
 $("topicIn").onkeydown = e => { if (e.key === "Enter") frame($("topicIn").value); };
 paintCats();
 
-async function frame(topic){
+// ---------- debate the attached ----------
+let attach = null; // { type:"image"|"pdf"|"text", data|text, media_type, name }
+function showAttach(label, thumb){
+  $("atPreview").innerHTML = (thumb ? `<img src="${thumb}" alt="">` : "") + `<span>📎 ${esc(label)}</span><button class="pill" id="atClear">✕ Remove</button>`;
+  $("atPreview").classList.remove("hide");
+  $("atClear").onclick = () => { attach = null; $("atPreview").classList.add("hide"); };
+}
+$("atPhoto").onclick = () => $("atImg").click();
+$("atFile").onclick = () => $("atDoc").click();
+$("atPaste").onclick = () => { $("atText").classList.toggle("hide"); if (!$("atText").classList.contains("hide")) $("atText").focus(); };
+function shrinkImage(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      const d = c.toDataURL("image/jpeg", 0.85); URL.revokeObjectURL(url); res(d);
+    };
+    img.onerror = rej; img.src = url;
+  });
+}
+$("atImg").onchange = async () => {
+  const f = $("atImg").files[0]; if (!f) return;
+  try { const d = await shrinkImage(f); attach = { type:"image", media_type:"image/jpeg", data:d.split(",")[1], name:f.name }; showAttach(f.name || "Your picture", d); }
+  catch(e) { toast("That picture couldn't be read. Try a screenshot or a JPG."); }
+  $("atImg").value = "";
+};
+function readAs(file, how){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r[how](file); }); }
+let mammothP = null;
+function loadMammoth(){ if (window.mammoth) return Promise.resolve(); if (!mammothP) mammothP = new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); return mammothP; }
+$("atDoc").onchange = async () => {
+  const f = $("atDoc").files[0]; if (!f) return;
+  try {
+    if (/\.pdf$/i.test(f.name) || f.type === "application/pdf") {
+      if (f.size > 3.2e6) { toast("That PDF is too big. Try one under 3 MB, or paste the text."); return; }
+      const d = await readAs(f, "readAsDataURL"); attach = { type:"pdf", data:String(d).split(",")[1], name:f.name };
+    } else if (/\.docx?$/i.test(f.name)) {
+      await loadMammoth(); const buf = await readAs(f, "readAsArrayBuffer"); const r = await window.mammoth.extractRawText({ arrayBuffer: buf });
+      attach = { type:"text", text:String(r.value || "").slice(0, 20000), name:f.name };
+    } else {
+      attach = { type:"text", text:String(await readAs(f, "readAsText")).slice(0, 20000), name:f.name };
+    }
+    showAttach(f.name);
+  } catch(e) { toast("That file couldn't be read. Try a PDF, a Word file, or paste the text."); }
+  $("atDoc").value = "";
+};
+$("atGo").onclick = () => {
+  let a = attach;
+  const pasted = $("atText").value.trim();
+  if (!a && pasted) a = { type:"text", text:pasted.slice(0, 20000), name:"Pasted text" };
+  if (!a) { toast("Add a picture, a file, or paste some text first."); return; }
+  frame($("atNote").value.trim(), a);
+};
+
+async function frame(topic, att){
   topic = String(topic || "").trim();
-  if (!topic) { $("topicIn").focus(); return; }
+  if (!topic && !att) { $("topicIn").focus(); return; }
   blessVoice();
   const s1 = $("step2").classList.contains("hide") ? $("s1") : $("s2"); $("s1").textContent = ""; $("s2").textContent = "";
-  s1.className = "status"; s1.textContent = "Setting up the debate…";
-  $("topicGo").disabled = true;
+  s1.className = "status"; s1.textContent = att ? "Reading what you attached…" : "Setting up the debate…";
+  $("topicGo").disabled = true; $("atGo").disabled = true;
   try {
-    const f = await post("/api/debate", { part:"setup", topic, kid:S.kid }, 30000);
+    const f = await post("/api/debate", { part:"setup", topic, kid:S.kid, attach: att ? { type:att.type, data:att.data, text:att.text, media_type:att.media_type } : undefined }, 60000);
     if (!f.ok) {
       s1.className = "status err";
       s1.innerHTML = esc(f.reason || "Let's pick a different topic.") + (f.title ? ` <button class="chip" id="altBtn" style="margin-left:6px;min-height:0">Try: ${esc(f.title)}</button>` : "");
@@ -545,6 +680,11 @@ async function frame(topic){
       return;
     }
     S.frame = f; s1.textContent = "";
+    S.frame.source = f.summary ? (f.summary + (f.points && f.points.length ? " Main points: " + f.points.join(" | ") : "")) : "";
+    const srcHTML = f.summary ? "📎 From what you attached: " + esc(f.summary) : "";
+    if (f.kind === "ranking") { startRankingSetup(f, srcHTML); return; }
+    $("step2r").classList.add("hide");
+    $("srcLine").innerHTML = srcHTML; $("srcLine").classList.toggle("hide", !srcHTML);
     $("question").textContent = f.title + " — " + f.question;
     $("sideA").innerHTML = esc(f.sideA) + "<small>Side A</small>";
     $("sideB").innerHTML = esc(f.sideB) + "<small>Side B</small>";
@@ -554,14 +694,84 @@ async function frame(topic){
     $("step2").scrollIntoView({ behavior:"smooth", block:"start" });
     // Start the research now, while the player picks a side and the debaters.
     S.facts = []; $("researchMsg").innerHTML = "🔎 Researching trusted sources…";
-    S.researchP = post("/api/debate", { part:"research", title:f.title, category:f.category, sideA:f.sideA, sideB:f.sideB, searches:f.searches }, 60000)
+    S.researchP = post("/api/debate", { part:"research", title:f.title, category:f.category, sideA:f.sideA, sideB:f.sideB, searches:f.searches, source:S.frame.source }, 60000)
       .then(r => { S.facts = r.facts || []; S.web = !!r.web; S.searched = r.searched || [];
         $("researchMsg").innerHTML = S.facts.length ? `<b>✓ Research done:</b> ${S.facts.length} facts found${S.web ? " on " + esc(S.searched.slice(0,4).join(", ")) + " and more" : " (from general knowledge)"}.` : "Research came back thin. The debaters will argue from general knowledge.";
         return r; })
       .catch(() => { $("researchMsg").textContent = "Research had trouble. The debaters will argue from general knowledge."; return null; });
   } catch (e) {
     s1.className = "status err"; s1.textContent = e.message || "That didn't go through. Please try again.";
-  } finally { $("topicGo").disabled = false; }
+  } finally { $("topicGo").disabled = false; $("atGo").disabled = false; }
+}
+
+// ---------- RANKING: build your list ----------
+const normName = x => String(x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+function startRankingSetup(f, srcHTML){
+  const size = f.size || 5;
+  S.rank = { size, A: (f.list || []).slice(), why: {}, alt: [], mine: (f.list || []).slice(), ready: !!(f.list && f.list.length) };
+  $("step2").classList.add("hide"); $("step3").classList.add("hide");
+  $("rQuestion").textContent = f.title + " — " + f.question;
+  $("rSrcLine").innerHTML = srcHTML; $("rSrcLine").classList.toggle("hide", !srcHTML);
+  $("rLeftTitle").textContent = f.list && f.list.length ? "The attached list" : "The researched list";
+  $("rWatch").classList.remove("picked");
+  paintRankLists();
+  $("step2r").classList.remove("hide");
+  $("step2r").scrollIntoView({ behavior:"smooth", block:"start" });
+  S.facts = []; $("researchMsg").innerHTML = "🔎 Researching trusted sources…";
+  S.researchP = post("/api/debate", { part:"research", kind:"ranking", size, list:f.list || [], title:f.title, category:f.category, sideA:f.sideA, sideB:f.sideB, searches:f.searches, source:S.frame.source }, 75000)
+    .then(r => {
+      S.facts = r.facts || []; S.web = !!r.web; S.searched = r.searched || [];
+      const rk = (r.ranking || []).filter(x => x.name);
+      if (!S.rank.A.length && rk.length) { S.rank.A = rk.map(x => x.name); if (!S.rank.mine.length) S.rank.mine = S.rank.A.slice(); }
+      rk.forEach(x => { if (x.reason) S.rank.why[normName(x.name)] = x.reason; });
+      S.rank.alt = (r.alt || []).map(x => x.name).filter(Boolean);
+      (r.alt || []).forEach(x => { if (x.reason && !S.rank.why[normName(x.name)]) S.rank.why[normName(x.name)] = x.reason; });
+      if (!S.rank.alt.length) S.rank.alt = S.rank.A.slice().reverse();
+      S.rank.ready = S.rank.A.length > 0;
+      paintRankLists();
+      $("researchMsg").innerHTML = S.facts.length ? `<b>✓ Research done:</b> ${S.facts.length} facts found${S.web ? " on " + esc(S.searched.slice(0,4).join(", ")) + " and more" : " (from general knowledge)"}.` : "Research came back thin. The debaters will argue from general knowledge.";
+      return r;
+    })
+    .catch(() => { $("researchMsg").textContent = "Research had trouble. The debaters will argue from general knowledge."; if (!S.rank.A.length) { $("rLeft").innerHTML = `<div class="wait">Couldn't build the list. Please try again.</div>`; } return null; });
+}
+function paintRankLists(){
+  const R = S.rank;
+  if (!R.A.length) {
+    $("rLeft").innerHTML = `<div class="wait">🔎 Building the researched top ${R.size}…</div>`;
+    $("rMine").innerHTML = `<div class="wait">Your copy appears here to change.</div>`;
+    $("rPlay").disabled = true; $("rWatch").disabled = true; return;
+  }
+  $("rPlay").disabled = false; $("rWatch").disabled = false;
+  $("rLeft").innerHTML = R.A.map(n => `<li><span class="nm">${esc(n)}${R.why[normName(n)] ? `<span class="why">${esc(R.why[normName(n)])}</span>` : ""}</span></li>`).join("");
+  $("rMine").innerHTML = R.mine.map((n, i) => `<li><span class="nm">${esc(n)}</span><button data-up="${i}" ${i === 0 ? "disabled" : ""} title="Move up">▲</button><button data-down="${i}" ${i === R.mine.length - 1 ? "disabled" : ""} title="Move down">▼</button><button data-del="${i}" title="Remove">✕</button></li>`).join("") || `<div class="wait">Your list is empty. Add someone below.</div>`;
+}
+$("rMine").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const L = S.rank.mine;
+  if (b.dataset.up) { const i = +b.dataset.up; [L[i - 1], L[i]] = [L[i], L[i - 1]]; }
+  else if (b.dataset.down) { const i = +b.dataset.down; [L[i + 1], L[i]] = [L[i], L[i + 1]]; }
+  else if (b.dataset.del) { L.splice(+b.dataset.del, 1); }
+  paintRankLists();
+};
+function addToMine(){
+  const v = $("rAdd").value.trim(); if (!v) return;
+  if (S.rank.mine.some(x => normName(x) === normName(v))) { toast(v + " is already on your list."); return; }
+  if (S.rank.mine.length >= 10) { toast("Lists can have up to 10. Remove someone first."); return; }
+  S.rank.mine.push(v); $("rAdd").value = ""; paintRankLists();
+}
+$("rAddGo").onclick = addToMine;
+$("rAdd").onkeydown = e => { if (e.key === "Enter") addToMine(); };
+$("rPlay").onclick = () => {
+  if (!S.rank.mine.length) { toast("Add at least one name to your list."); return; }
+  S.mode = "play"; S.userSide = "B"; S.aiSide = "A"; S.frame.sideA = "The list"; S.frame.sideB = "Your list";
+  $("rWatch").classList.remove("picked"); showStep3();
+};
+$("rWatch").onclick = () => { S.mode = "watch"; S.frame.sideA = "The list"; S.frame.sideB = "Challenger list"; $("rWatch").classList.add("picked"); showStep3(); };
+const isRank = () => !!(S.frame && S.frame.kind === "ranking" && S.rank);
+function rankLists(slot){
+  if (!isRank()) return undefined;
+  if (S.mode === "watch") return slot === "B" ? { mine:S.rank.alt, theirs:S.rank.A } : { mine:S.rank.A, theirs:S.rank.alt };
+  return { mine:S.rank.A, theirs:S.rank.mine };
 }
 
 // ---------- step 2: swap a side, or turn it into a yes/no debate ----------
@@ -851,8 +1061,8 @@ function paintRounds(){
   if (S.round >= GOAL) $("replyHint").textContent = "Great debate! Keep going, or tap 🏆 End & judge.";
 }
 function paintFacts(){
-  const tag = s => s === "A" ? `<span class="tagA">${esc(S.frame.sideA)}</span>` : s === "B" ? `<span class="tagB">${esc(S.frame.sideB)}</span>` : "<b>Both</b>";
-  $("factList").innerHTML = S.facts.length ? S.facts.map(f => `<li>${tag(f.side)}: ${esc(f.text)} ${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">(${esc(f.source)})</a>` : `<i>(${esc(f.source)})</i>`}</li>`).join("") : "<li>No research notes this time.</li>";
+  const tag = s => isRank() ? "" : s === "A" ? `<span class="tagA">${esc(S.frame.sideA)}</span>` : s === "B" ? `<span class="tagB">${esc(S.frame.sideB)}</span>` : "<b>Both</b>";
+  $("factList").innerHTML = S.facts.length ? S.facts.map(f => `<li>${tag(f.side) ? tag(f.side) + ": " : ""}${esc(f.text)} ${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">(${esc(f.source)})</a>` : `<i>(${esc(f.source)})</i>`}</li>`).join("") : "<li>No research notes this time.</li>";
   $("factFine").textContent = S.web ? "Found by searching trusted sites like " + S.searched.slice(0, 5).join(", ") + ". Click a source to check it yourself." : "These come from general knowledge, not a live web search. Double-check anything important.";
 }
 function logEntry(cls, who, text){
@@ -882,13 +1092,18 @@ function enterArena(){
   $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case.";
   $("replyIn").placeholder = watch ? "Ask a question or make a point…" : "Make your argument…";
   $("sendBtn").textContent = watch ? "Ask ➤" : "Send ➤";
+  const rk = isRank();
+  document.querySelectorAll("#playMoves .rk").forEach(b => b.classList.toggle("hide", !rk));
+  document.querySelectorAll("#playMoves .nrk").forEach(b => b.classList.toggle("hide", rk));
+  if (rk && !watch) $("replyHint").textContent = "Argue about who belongs, who's missing, and the order. Type or tap 🎤.";
   buildStage(); resetArena(); paintTopic();
+  if (rk) addProof({ kind:"lists", title:"The two lists" });
 }
 
 // ---------- PLAY mode: you vs one debater ----------
 function setBusy(b, action){
   S.busy = b;
-  ["sendBtn","micBtn","mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof"].forEach(id => $(id).disabled = b);
+  ["sendBtn","micBtn","mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof","mMissing","mShouldnt","mNumberOne"].forEach(id => $(id).disabled = b);
   thinking(b, (THINK[action] || THINK.reply).replace("{n}", nameOf()));
   if (b) setExpr(action === "reply" || action === "unfair" ? "smug" : "calm");
   paintCtrls();
@@ -909,7 +1124,8 @@ async function doTurn(action, userText){
       part:"turn", action, userText: userText || "",
       title:S.frame.title, question:S.frame.question, category:S.frame.category, sideA:S.frame.sideA, sideB:S.frame.sideB,
       aiSide:S.aiSide, persona:S.persona, face:S.face, name:nameOf(), kid:S.kid,
-      facts:S.facts, history:S.history, round:S.round || 1
+      facts:S.facts, history:S.history, round:S.round || 1,
+      kind:S.frame.kind, lists:rankLists(), source:S.frame.source || ""
     });
     S.history.push({ who:"ai", text:r.say });
     logEntry("ai", nameOf(), r.say);
@@ -954,6 +1170,9 @@ $("challengeProof").onclick = () => {
   else { S.pending = "challenge_proof"; t.value = `I challenge Proof #${S.pIdx + 1} because `; }
   t.focus(); t.setSelectionRange(t.value.length, t.value.length); t.scrollIntoView({ behavior:"smooth", block:"center" });
 };
+[["mMissing","missing","Who's missing?"],["mShouldnt","shouldnt","Who shouldn't be there?"],["mNumberOne","numberone","Why is #1 #1?"]].forEach(([id, act, said]) => {
+  $(id).onclick = () => { if (S.busy) return; blessVoice(); S.history.push({ who:"user", text:said }); logEntry("user", "You", said); S.round++; paintRounds(); doTurn(act); };
+});
 $("mSwitch").onclick = () => {
   blessVoice();
   const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; paintTopic();
@@ -984,7 +1203,8 @@ async function fetchWatchTurn(step){
     title:S.frame.title, question:S.frame.question, category:S.frame.category, sideA:S.frame.sideA, sideB:S.frame.sideB,
     aiSide:step.s, persona:d.persona, face:d.face, name:FACES[d.face].name,
     opponentName:FACES[o.face].name, opponentPersona:o.persona, kid:S.kid,
-    facts:S.facts, history:histFor(step.s), round: Math.floor(S.wi / 2) + 1
+    facts:S.facts, history:histFor(step.s), round: Math.floor(S.wi / 2) + 1,
+    kind:S.frame.kind, lists:rankLists(step.s), source:S.frame.source || ""
   });
   const data = await getVoice(r.say, d.face, d.persona);
   return { r, data, step };
@@ -1109,9 +1329,10 @@ function chart(p){
   const T = (x, y, s, o) => `<text x="${x}" y="${y}" font-family="Inter,sans-serif" font-weight="${(o && o.w) || 700}" font-size="${(o && o.size) || 16}" fill="${(o && o.fill) || "#f7f2ff"}" text-anchor="${(o && o.anchor) || "middle"}">${esc(s)}</text>`;
   if (p.kind === "compare") {
     const rows = p.rows; const n = rows.length;
-    g += `<circle cx="306" cy="34" r="8" fill="${A}"/>` + T(290, 41, S.frame.sideA, { anchor:"end", size:20, w:800, fill:A });
+    const leg = p.names && p.names.length === 2 ? p.names : [S.frame.sideA, S.frame.sideB];
+    g += `<circle cx="306" cy="34" r="8" fill="${A}"/>` + T(290, 41, leg[0], { anchor:"end", size:20, w:800, fill:A });
     g += T(400, 40, "vs", { size:15, fill:"#a596c8" });
-    g += `<circle cx="494" cy="34" r="8" fill="${B}"/>` + T(510, 41, S.frame.sideB, { anchor:"start", size:20, w:800, fill:B });
+    g += `<circle cx="494" cy="34" r="8" fill="${B}"/>` + T(510, 41, leg[1], { anchor:"start", size:20, w:800, fill:B });
     const avail = H - 66 - 14, rh = Math.min(104, avail / n), bh = Math.min(34, rh - 38), half = 290, top = 66 + (avail - rh * n) / 2;
     rows.forEach((r, i) => {
       const y = top + i * rh, max = Math.max(Math.abs(r.a), Math.abs(r.b)) || 1;
@@ -1153,6 +1374,17 @@ function chart(p){
   }
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title || "Proof chart")}">${g}</svg>`;
 }
+function listsHTML(){
+  const R = S.rank, watch = S.mode === "watch";
+  const left = R.A, right = watch ? R.alt : R.mine;
+  const lName = watch ? debName("A") + "'s list" : "The list (" + nameOf() + ")";
+  const rName = watch ? debName("B") + "'s list" : "Your list";
+  const col = (L, O, title, cls) => `<div class="${cls}"><h4>${esc(title)}</h4><ol>${L.map((n, i) => {
+    const j = O.findIndex(x => normName(x) === normName(n));
+    const tg = j < 0 ? `<span class="tg only">★ only here</span>` : j === i ? `<span class="tg same">✓ same</span>` : j > i ? `<span class="tg up">↑ ${j - i} higher</span>` : `<span class="tg down">↓ ${i - j} lower</span>`;
+    return `<li><b>${i + 1}</b><span class="n">${esc(n)}</span>${tg}</li>`; }).join("")}</ol></div>`;
+  return `<div class="lv">${col(left, right, lName, "A")}${col(right, left, rName, "B")}</div>`;
+}
 function pointsHTML(p){
   return `<div class="pts n${p.rows.length}">${p.rows.map(r => `<div class="pt ${r.side}"><div class="pl">${esc(r.label)}</div><div class="ptx">${esc(r.text)}</div><div class="ps">For ${esc(sideName(r.side))}</div></div>`).join("")}</div>`;
 }
@@ -1162,15 +1394,21 @@ function paintProof(){
   $("pNum").textContent = n ? `${S.pIdx + 1} of ${n}` : "";
   $("challengeProof").classList.toggle("hide", !p);
   $("challengeProof").textContent = S.mode === "watch" ? "🙋 Ask about this proof" : "⚡ Challenge this proof";
-  $("screen").classList.toggle("auto", !!p && p.kind === "points");
+  $("screen").classList.toggle("auto", !!p && (p.kind === "points" || p.kind === "lists"));
   if (!p) {
     $("pTitle").innerHTML = "Proof board";
     $("screen").innerHTML = `<div class="empty">📊 Charts and proof will appear here as the case is made.</div>`;
     $("pCap").textContent = ""; $("pCheck").innerHTML = ""; $("pSrcs").innerHTML = ""; return;
   }
   $("pTitle").innerHTML = `Proof #${S.pIdx + 1}<span>${esc(p.title || "")}</span>`;
-  $("screen").innerHTML = p.kind === "points" ? pointsHTML(p) : chart(p);
+  $("screen").innerHTML = p.kind === "lists" ? listsHTML() : p.kind === "points" ? pointsHTML(p) : chart(p);
   $("pCap").textContent = p.caption ? `"${p.caption}"` : "";
+  if (p.kind === "lists") {
+    $("challengeProof").classList.add("hide");
+    $("pCap").textContent = "★ only on one list · ↑↓ ranked higher or lower than on the other list · ✓ same spot";
+    $("pCheck").innerHTML = ""; $("pSrcs").innerHTML = S.mode === "watch" ? "" : "Tap 🔎 Who's missing?, 🚫 Who shouldn't be there? or 👑 Why is #1 #1? to argue the differences.";
+    return;
+  }
   if (p.kind === "points") $("pCheck").innerHTML = (p.fact_ids || []).length ? `<span class="check ok">📎 From the research</span>` : `<span class="check warn">⚠ Not tied to a source. Challenge it!</span>`;
   else $("pCheck").innerHTML = p.checked >= 0.8 ? `<span class="check ok">✓ Numbers match the research</span>`
     : p.checked >= 0.5 ? `<span class="check ok">✓ Mostly matches the research</span>`
@@ -1191,6 +1429,7 @@ async function showJudge(){
     const body = watch
       ? { part:"judge", title:S.frame.title, nameA:debName("A"), nameB:debName("B"), sideA:S.frame.sideA, sideB:S.frame.sideB, kid:S.kid, history:S.history }
       : { part:"judge", title:S.frame.title, name:nameOf(), kid:S.kid, history:S.history };
+    if (isRank()) { body.kind = "ranking"; body.lists = watch ? { first:S.rank.A, second:S.rank.alt } : { first:S.rank.mine, second:S.rank.A }; }
     const j = await post("/api/debate", body, 60000);
     const ty = j.you.evidence + j.you.logic + j.you.style, ta = j.ai.evidence + j.ai.logic + j.ai.style;
     const n1 = watch ? debName("A") : "You", n2 = watch ? debName("B") : nameOf();
@@ -1199,15 +1438,16 @@ async function showJudge(){
     const col = (title, sc, tot) => `<div class="sc"><h4>${title}</h4>${["evidence","logic","style"].map(k => `<div class="row"><span>${k[0].toUpperCase() + k.slice(1)}</span><div class="bar"><i data-w="${sc[k] * 10}"></i></div><span>${sc[k]}</span></div>`).join("")}<div class="tot">Total: ${tot} / 30</div></div>`;
     $("judgeBody").innerHTML = `<div class="banner">${banner}</div><p class="verdict">${esc(j.verdict)}</p>
       <div class="scores">${col(esc(n1) + " (" + esc(s1) + ")", j.you, ty)}${col(esc(n2) + " (" + esc(s2) + ")", j.ai, ta)}</div>
+      ${j.compromise && j.compromise.length ? `<div class="complist"><h4>🤝 The judge's compromise list</h4><ol>${j.compromise.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>` : ""}
       <div class="moments"><p>⭐ <b>${watch ? esc(n1) + "'s" : "Your"} best moment:</b> ${esc(j.best_you)}</p><p>🎯 <b>${esc(n2)}'s best moment:</b> ${esc(j.best_ai)}</p><p>💡 <b>${watch ? "Takeaway" : "Tip for next time"}:</b> ${esc(j.tip)}</p></div>
-      <div class="jbtns"><button class="go" id="rematch">🔄 ${watch ? "Run it back, swap sides" : "Rematch, switch sides"}</button><button class="pill" id="newOpp">🎭 ${watch ? "New debaters" : "New opponent"}</button><button class="pill" id="backDebate">↩ Back to the debate</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
+      <div class="jbtns"><button class="go" id="rematch">🔄 ${watch ? "Run it back, swap sides" : isRank() ? "Rematch" : "Rematch, switch sides"}</button><button class="pill" id="newOpp">🎭 ${watch ? "New debaters" : "New opponent"}</button><button class="pill" id="backDebate">↩ Back to the debate</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
     setTimeout(() => $("judgeBody").querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.w + "%"), 60);
     if (j.winner === "you" && !watch) confetti();
     if (watch && j.winner !== "tie") confetti();
     $("rematch").onclick = () => {
       $("judgeOv").classList.remove("on"); stopAll();
       if (watch) { const t = S.deb.A; S.deb.A = S.deb.B; S.deb.B = t; startWatch(); }
-      else { const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; startDebate(); }
+      else { if (!isRank()) { const t = S.userSide; S.userSide = S.aiSide; S.aiSide = t; } startDebate(); }
     };
     $("newOpp").onclick = () => { stopAll(); $("judgeOv").classList.remove("on"); $("arenaWrap").classList.add("hide"); $("setup").classList.remove("hide"); showStep3(); };
     $("backDebate").onclick = () => { stopVoice(); $("judgeOv").classList.remove("on"); };
