@@ -303,7 +303,7 @@ const WATCH_ACTIONS = {
   open: "OPENING STATEMENT. Introduce yourself in one quick line, make your 2 strongest points from two DIFFERENT dimensions, show proof, and end by challenging your opponent by name.",
   rebut_open: "Your opponent just opened. Introduce yourself in one quick line, answer the weakest part of their opening, then make your 2 strongest points from different dimensions, with proof. End with a jab or question to your opponent by name.",
   reply: "Respond to your opponent's last turn. Knock down the weakest part, then add one new point from a dimension you haven't used yet, with proof when it helps. If they made a genuinely good point, give them brief credit, then pivot. End with a jab or a question for them.",
-  moderator: "The MODERATOR (the person watching) just asked a question (below). Answer it directly and honestly for your side first, with one or two strong reasons, then a quick good-natured jab at your opponent.",
+  moderator: "The MODERATOR (the person watching) just jumped in with a question or comment (below). If it's a question, answer it directly and honestly for your side. If it's a comment or challenge, respond to it head-on (agree where they're right). Then give one strong reason for your side and a quick good-natured jab at your opponent.",
   closing: "CLOSING STATEMENT. Sum up your best 2 points (ideally one number and one about impact), tip your hat to your opponent graciously in character, and leave the verdict to the judge. Proof kind 'none'."
 };
 async function turn(body) {
