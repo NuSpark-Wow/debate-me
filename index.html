@@ -780,6 +780,7 @@ function fmt(v, unit){
   const a = Math.abs(v);
   if (a >= 1e9) s = (v / 1e9).toFixed(a >= 1e10 ? 0 : 1).replace(/\.0$/, "") + "B";
   else if (a >= 1e6) s = (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, "") + "M";
+  else if (a > 0 && a < 1) { s = String(+v.toFixed(3)); if (/avg|average|pct/i.test(u)) return s.replace(/^(-?)0\./, "$1."); }
   else s = (Math.round(v * 100) / 100).toLocaleString("en-US");
   if (/^(\$|usd|dollars?)$/i.test(u)) return "$" + s;
   if (u === "%" || /^percent/i.test(u)) return s + "%";
