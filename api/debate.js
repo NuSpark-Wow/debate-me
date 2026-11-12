@@ -108,6 +108,7 @@ const SETUP_TOOL = {
     properties: {
       ok: { type: "boolean" },
       reason: { type: "string", description: "If ok is false: one friendly sentence explaining, and suggest a fun alternative topic." },
+      kind: { type: "string", enum: ["versus", "claim", "yesno"], description: "versus = two named things/people; claim = for vs against one claim; yesno = a yes/no question" },
       title: { type: "string", description: "Short title, e.g. 'Prince vs Michael Jackson'" },
       question: { type: "string", description: "The debate question, e.g. 'Who was the greater artist?'" },
       category: { type: "string", enum: Object.keys(SITES) },
@@ -128,6 +129,7 @@ Decide which kind of debate the user typed, and NEVER turn a claim about one thi
 - A CLAIM OR OPINION about one thing ("The Godfather is the greatest movie", "Pizza is overrated", "Jordan is the GOAT"): a FOR vs AGAINST debate. title = the claim as a question ("Is The Godfather the greatest movie ever?"), sideA = short FOR label ("Yes, it's #1"), sideB = short AGAINST label ("No, it's not"). Do not pick a rival for side B; the AGAINST side may mention rivals while arguing.
 - Yes/no questions ("Is a hot dog a sandwich?", "Should Pete Rose be in the Hall of Fame?"): sides "Yes, ..." / "No, ..." in a few words.
 - OPEN questions with no candidate named ("Who's the best 3rd baseman ever?", "What's the greatest movie of all time?"): pick the two strongest, most debated candidates (e.g. Mike Schmidt vs George Brett).
+- A line starting "Claim:" is always a FOR vs AGAINST debate about that claim (kind "claim").
 For FOR/AGAINST and yes/no debates, metrics and searches should cover the subject itself and how it stacks up against the field.
 ${DECLINE_TOPICS}
 Metrics must be BALANCED for the category, never only statistics. For example, sports = stats plus clutch and postseason, championships, peak dominance, impact on the game, era context, and peers' opinions; music = sales plus influence, innovation, critics' rankings, live performance; homes and products = cost plus durability, comfort, upkeep.
