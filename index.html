@@ -42,7 +42,10 @@ a{color:var(--gold)}
 .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .cat{flex:none;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14.5px}
 .cat.on{background:var(--gold);color:#2a1d00;border-color:var(--gold)}
-.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.chip small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--a);margin-bottom:4px}
+.chip.q small{color:var(--b)}
+.chip.ownc{grid-column:1/-1;min-height:54px}
 .chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15.5px;text-align:left;min-height:68px;line-height:1.25}
 .chip.ownc{border:2px dashed var(--gold);background:transparent;color:var(--gold);text-align:center}
 .chip.ownc.on{background:rgba(255,201,74,.12)}
@@ -399,14 +402,22 @@ const store = { get(k, d){ try { const v = localStorage.getItem(k); return v == 
 
 // ---------- data ----------
 const CATS = [
-  { id:"sports", label:"⚾ Sports", topics:["Best 3rd baseman of all time","Michael Jordan vs LeBron James","Babe Ruth vs Willie Mays","Tom Brady vs Joe Montana"] },
-  { id:"music", label:"🎵 Music", topics:["Prince vs Michael Jackson","The Beatles vs The Rolling Stones","Elvis vs Frank Sinatra","Vinyl vs streaming"] },
-  { id:"movies", label:"🎬 Movies & TV", topics:["Star Trek vs Star Wars","Friends vs Seinfeld","Al Pacino vs Robert De Niro","The Godfather vs The Godfather Part II"] },
-  { id:"history", label:"🏛️ History", topics:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson"] },
-  { id:"food", label:"🍔 Food & Health", topics:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Is breakfast the most important meal?"] },
-  { id:"home", label:"🏠 Home & Life", topics:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets"] },
-  { id:"toys", label:"🧸 Toys & Pop Culture", topics:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation"] },
-  { id:"other", label:"✨ Other", topics:["Picasso vs Van Gogh","Is a hot dog a sandwich?","Books vs movies","Morning person vs night owl"] }
+  { id:"sports", label:"⚾ Sports", vs:["Michael Jordan vs LeBron James","Babe Ruth vs Willie Mays","Tom Brady vs Joe Montana","Yankees vs Red Sox"],
+    q:["Who's the best 3rd baseman of all time?","Should Pete Rose be in the Hall of Fame?","Is the designated hitter good for baseball?","Are today's athletes better than the legends?"] },
+  { id:"music", label:"🎵 Music", vs:["Prince vs Michael Jackson","The Beatles vs The Rolling Stones","Elvis vs Frank Sinatra","Vinyl vs streaming"],
+    q:["Who is the greatest singer of all time?","Were the '80s the best decade for music?","Do the Grammys still matter?","Is today's music as good as the classics?"] },
+  { id:"movies", label:"🎬 Movies & TV", vs:["Star Trek vs Star Wars","Friends vs Seinfeld","Al Pacino vs Robert De Niro","The Godfather vs The Godfather Part II"],
+    q:["What's the greatest movie of all time?","Is a remake ever better than the original?","Is streaming better than going to the movies?","Was TV better in the '90s?"] },
+  { id:"history", label:"🏛️ History", vs:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson"],
+    q:["What was the greatest invention ever?","Who was the most important Founding Father?","Was the moon landing America's greatest achievement?","Which century changed the world the most?"] },
+  { id:"food", label:"🍔 Food & Health", vs:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Butter vs margarine"],
+    q:["Is breakfast the most important meal?","Does pineapple belong on pizza?","Is a little chocolate good for you?","Is organic food worth the price?"] },
+  { id:"home", label:"🏠 Home & Life", vs:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets"],
+    q:["Is working from home better than the office?","Should you make your bed every day?","Is it okay to recline your airplane seat?","Are smartphones making life better?"] },
+  { id:"toys", label:"🧸 Toys & Pop Culture", vs:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation"],
+    q:["What's the greatest toy of all time?","Are video games good for kids?","Were Saturday-morning cartoons the best TV ever?","Are superhero movies getting old?"] },
+  { id:"other", label:"✨ Other", vs:["Picasso vs Van Gogh","Books vs movies","Morning person vs night owl","Beach vacation vs mountain vacation"],
+    q:["Is a hot dog a sandwich?","Is photography real art?","Is cursive still worth learning?","Should daylight saving time end?"] }
 ];
 const FACES = {
   young:  { name:"Jake",   age:"30s", emoji:"🧢", color:"#2bb3b1" },
@@ -478,13 +489,15 @@ function paintCats(){
   $("cats").innerHTML = CATS.map(c => `<button class="cat${c.id === catOn ? " on" : ""}" data-c="${c.id}">${c.label}</button>`).join("");
   const cat = CATS.find(c => c.id === catOn);
   const ownOn = !$("ownRow").classList.contains("hide");
-  $("chips").innerHTML = cat.topics.map(t => `<button class="chip">${esc(t)}</button>`).join("") + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own</button>`;
+  $("chips").innerHTML = cat.vs.map(t => `<button class="chip"><small>⚔️ Head to head</small>${esc(t)}</button>`).join("")
+    + cat.q.map(t => `<button class="chip q"><small>❓ Big question</small>${esc(t)}</button>`).join("")
+    + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own topic</button>`;
 }
 $("cats").onclick = e => { const b = e.target.closest(".cat"); if (!b) return; catOn = b.dataset.c; paintCats(); };
 $("chips").onclick = e => {
   const b = e.target.closest(".chip"); if (!b) return;
   if (b.id === "ownChip") { $("ownRow").classList.remove("hide"); b.classList.add("on"); $("topicIn").focus(); return; }
-  frame(b.textContent);
+  frame(b.lastChild.textContent);
 };
 $("topicGo").onclick = () => frame($("topicIn").value);
 $("topicIn").onkeydown = e => { if (e.key === "Enter") frame($("topicIn").value); };
