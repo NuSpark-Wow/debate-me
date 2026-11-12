@@ -28,6 +28,20 @@ const SITES = {
   other: ["wikipedia.org", "britannica.com"]
 };
 
+// What a well-rounded argument covers in each category (numbers are only one part).
+const DIMENSIONS = {
+  sports: "career stats AND peak dominance, clutch and postseason performance, championships, MVPs and awards, defense and all-around game, era and context (competition, rules, ballparks), impact on the game and how it changed, leadership, longevity, and what peers, coaches and Hall of Famers say",
+  music: "sales and chart hits AND influence on later artists, innovation and new sounds, songwriting and musicianship, live performance, critics' all-time rankings, awards, longevity, cultural moments, and what fellow musicians say",
+  movies_tv: "box office and ratings AND critics' reviews, awards, cultural impact and quotable moments, influence on later films and shows, craft (writing, acting, directing), rewatch value, longevity, and fan devotion",
+  history: "concrete achievements AND leadership in crisis, lasting impact on the country or world, historians' rankings, character and values, the challenges they faced, innovation, and how they are remembered",
+  food_health: "nutrition facts and health research AND taste and popularity, cost, convenience, culture and tradition, environmental impact, and what doctors and dietitians say",
+  home_life: "cost AND durability, comfort, upkeep and cleaning, health and allergies, resale value, safety, style, environmental impact, and everyday convenience",
+  toys_pop: "sales and popularity AND longevity, cultural impact, creativity and educational value, representation, fan community, and how it shaped kids' lives",
+  tech: "specs and sales AND innovation, ease of use, ecosystem, reliability, price, cultural impact, and expert reviews",
+  kids: "fun facts and numbers AND what makes it fun, what kids love about it, surprising science, and everyday life",
+  other: "the key numbers AND impact and influence, expert opinion, innovation, longevity, everyday practicality, cultural moments, and how people feel about it"
+};
+
 // The personalities change the tone, never the facts.
 const PERSONAS = {
   professor: "THE PROFESSOR: smart, calm, focused. Leads with data and logic. Dry wit. Phrases like \"The numbers are quite clear\" and \"Let's look at the evidence.\" Never raises his or her voice.",
@@ -99,8 +113,8 @@ const SETUP_TOOL = {
       category: { type: "string", enum: Object.keys(SITES) },
       sideA: { type: "string", description: "Side A, short (1-5 words), e.g. 'Prince' or 'Yes, it belongs'" },
       sideB: { type: "string", description: "Side B, short (1-5 words)" },
-      metrics: { type: "array", items: { type: "string" }, description: "4-6 measurable things to compare, e.g. 'career home runs', 'Gold Gloves', 'US #1 singles', 'albums certified by RIAA', 'cost per square foot'" },
-      searches: { type: "array", items: { type: "string" }, description: "4 short web search queries that would find the key numbers for both sides" }
+      metrics: { type: "array", items: { type: "string" }, description: "5-6 BALANCED things to compare: about half hard numbers (e.g. 'career home runs', 'US #1 singles', 'cost per square foot') and half impact factors (e.g. 'influence on later artists', 'critics' all-time rankings', 'innovations and firsts', 'longevity', 'cultural impact', 'comfort and upkeep')" },
+      searches: { type: "array", items: { type: "string" }, description: "4 short web search queries: 2 that find the key numbers for both sides, and 2 that find impact, influence, legacy, critics' rankings or expert opinion (e.g. 'Frank Sinatra influence legacy critics', 'Rolling Stone greatest singers Elvis Sinatra rank')" }
     },
     required: ["ok", "title", "question", "category", "sideA", "sideB", "metrics", "searches"]
   }
@@ -113,6 +127,8 @@ async function setup(body) {
 - "Best ___ ever" topics: pick the two strongest, most debated candidates (e.g. best 3rd baseman: Mike Schmidt vs George Brett).
 - Yes/no topics ("Is a hot dog a sandwich?"): sides like "Yes, it is" / "No, it isn't".
 ${DECLINE_TOPICS}
+Metrics must be BALANCED for the category, never only statistics. For example, sports = stats plus clutch and postseason, championships, peak dominance, impact on the game, era context, and peers' opinions; music = sales plus influence, innovation, critics' rankings, live performance; homes and products = cost plus durability, comfort, upkeep.
+Searches: 2 for the key numbers, 2 for the impact side (clutch moments, influence, legacy, critics' or experts' rankings, peer quotes).
 If ok is false, still fill the other fields with a fun safe alternative topic.
 Always call frame_debate.`;
   const out = await callTool(sys, SETUP_TOOL, `Topic: ${topic}${body.kid ? "\n(The player is a kid. Keep it kid-friendly.)" : ""}`, 700,
@@ -206,7 +222,12 @@ async function research(body) {
 
   const list = snips.map((s, i) => `[S${i + 1}] ${s.title} (${s.link})\n${s.snippet}`).join("\n\n");
   const sys = `You are a careful fact checker preparing a fact sheet for a friendly debate: "${title}". Side A = ${sideA}. Side B = ${sideB}.
-Pull 12-20 short, checkable facts that each side could use: records, stats, awards, sales, chart hits, box office, dates, prices, nutrition numbers, survey results, expert opinions (with who said it).
+Pull 14-22 short, checkable facts that each side could use, BALANCED across these kinds (aim for some of each that the snippets support):
+  1) numbers: records, stats, sales, chart hits, box office, prices, nutrition, survey results;
+  2) impact and influence: who they inspired or changed, what came after, peer and expert quotes (with who said it);
+  3) critical acclaim and rankings: critics' all-time lists, polls, honors and awards;
+  4) innovation and firsts, longevity and consistency, cultural moments, practical everyday factors.
+For this category, a well-rounded fact sheet covers: ${DIMENSIONS[cat]}.
 RULES: Use ONLY what the snippets actually say, with exact numbers, and cite the snippet number in src. Keep numbers exactly as written. Include the time frame when known.
 You may add up to 4 widely known facts with src 0 if the snippets miss something basic (e.g. dates of birth, well-known titles), but never invent statistics.
 Balance: give both sides real ammunition.
@@ -229,29 +250,33 @@ Always call fact_sheet.`;
 // ---------- the debater's turn ----------
 const TURN_TOOL = {
   name: "debate_turn",
-  description: "The debater's next spoken line, plus an optional proof chart.",
+  description: "The debater's next spoken line, plus an optional piece of proof for the screen.",
   input_schema: {
     type: "object",
     properties: {
       say: { type: "string", description: "What the debater says out loud. Plain spoken English, no markdown, no lists, no emojis, no stage directions in brackets." },
-      emotion: { type: "string", enum: ["calm", "smug", "outraged", "laugh"], description: "The face to show: outraged when reacting to a bold user claim, smug when landing a point, laugh at something funny or absurd, calm otherwise." },
+      emotion: { type: "string", enum: ["calm", "smug", "outraged", "laugh"], description: "The face to show: outraged when reacting to a bold claim, smug when landing a point, laugh at something funny or absurd, calm otherwise." },
       proof: {
         type: "object",
-        description: "A chart drawn from the fact sheet. Use kind 'none' if no numbers fit this moment.",
+        description: "Proof for the screen, from the fact sheet. Use kind 'none' if nothing fits this moment.",
         properties: {
-          kind: { type: "string", enum: ["compare", "bars", "line", "none"], description: "compare = side A vs side B on several measures (best default); bars = one measure across several items; line = a trend over time" },
-          title: { type: "string", description: "Short chart title, e.g. 'Career numbers'" },
+          kind: { type: "string", enum: ["compare", "bars", "line", "points", "none"], description: "compare = side A vs side B on several numeric measures; bars = one measure across several items; line = a trend over time; points = 2-4 short non-numeric proof cards (critics' rankings, expert or peer quotes, influence, firsts and innovations, honors, cultural moments, longevity)" },
+          title: { type: "string", description: "Short title, e.g. 'Career numbers' or 'What the experts say'" },
           caption: { type: "string", description: "One short line: what this proves, from the debater's point of view" },
           rows: {
             type: "array",
-            description: "compare: [{label, a, b, unit}] (a = side A value, b = side B value). bars/line: [{label, value, unit}]. 3-6 rows for compare and bars, 4-10 points for line.",
+            description: "compare: [{label, a, b, unit}] (a = side A value, b = side B value). bars/line: [{label, value, unit}]. points: [{label, text, side}] (label = 2-4 word heading like 'Critics agree', text = the fact in one sentence, side = 'A' or 'B'). 3-6 rows for compare and bars, 4-10 for line, 2-4 for points.",
             items: {
               type: "object",
-              properties: { label: { type: "string" }, a: { type: "number" }, b: { type: "number" }, value: { type: "number" }, unit: { type: "string" }, lower_is_better: { type: "boolean", description: "true when a smaller number wins (calories, cost, errors, ERA)" } },
+              properties: {
+                label: { type: "string" }, a: { type: "number" }, b: { type: "number" }, value: { type: "number" }, unit: { type: "string" },
+                lower_is_better: { type: "boolean", description: "true when a smaller number wins (calories, cost, errors, ERA, a ranking position)" },
+                text: { type: "string" }, side: { type: "string", enum: ["A", "B"] }
+              },
               required: ["label"]
             }
           },
-          fact_ids: { type: "array", items: { type: "integer" }, description: "The fact sheet ids every number came from" }
+          fact_ids: { type: "array", items: { type: "integer" }, description: "The fact sheet ids the proof came from" }
         },
         required: ["kind"]
       },
@@ -260,50 +285,72 @@ const TURN_TOOL = {
     required: ["say", "emotion", "proof"]
   }
 };
+const BALANCE = `ARGUE ON MANY FRONTS, NOT JUST NUMBERS. Great debaters mix hard data with the bigger picture. Across the debate, rotate through different kinds of proof and don't lean on one stat type:
+  numbers (records, sales, stats, prices) • impact and influence (who they changed, who they inspired, what came after) • innovation and firsts • critical acclaim and expert rankings • honors and awards • longevity and consistency • cultural moments and how people felt • practical everyday factors (for products and lifestyle topics: cost, comfort, durability, health, upkeep).
+  Each turn, bring at least one point from a DIFFERENT dimension than your last turn. Use "points" proof cards for non-numeric proof, and charts for numbers.`;
 const ACTIONS = {
-  open: "OPENING STATEMENT. Introduce yourself in one quick line (your name and that you're taking your side), make your 2 strongest points, show a proof chart, and end by challenging the user to respond.",
-  reply: "The user just made their argument (below). React to it in character, take apart the weakest part with facts, add one new point for your side, and end with a short challenge question back to them. If they made a genuinely good point, admit it briefly and gracefully, then pivot.",
-  proof: "The user said 'Show me proof.' Back up your most recent claim with hard numbers: the proof chart is required here (kind compare, bars or line) and your line should walk through what it shows.",
-  source: "The user asked 'Where's that from?' Say plainly where your recent numbers come from, naming the actual sources from the fact sheet (e.g. Baseball-Reference, Billboard, Wikipedia). If a point was general knowledge rather than a sourced number, admit it honestly. Keep the chart kind 'none' unless re-showing the same numbers helps.",
+  open: "OPENING STATEMENT. Introduce yourself in one quick line (your name and that you're taking your side), make your 2 strongest points from two DIFFERENT dimensions (for example one stat and one about impact), show proof, and end by challenging the user to respond.",
+  reply: "The user just made their argument (below). React to it in character, take apart the weakest part, add one new point for your side from a dimension you haven't used yet, and end with a short challenge question back to them. If they made a genuinely good point, admit it briefly and gracefully, then pivot.",
+  proof: "The user said 'Show me proof.' Back up your most recent claim: proof is required here (a chart for numbers, or points cards for rankings, quotes or influence), and your line should walk through what it shows.",
+  source: "The user asked 'Where's that from?' Say plainly where your recent claims come from, naming the actual sources from the fact sheet (e.g. Baseball-Reference, Billboard, Wikipedia). If a point was general knowledge rather than a sourced fact, admit it honestly. Keep proof kind 'none' unless re-showing the same proof helps.",
   unfair: "The user says your argument is not fair and explains why (below). Take the objection seriously: if they have a point (era, context, missing measure, cherry-picked stat), concede that part honestly, then argue why your side still wins on balance.",
-  challenge_proof: "The user is challenging one of your proof charts (below). Defend it or refine it honestly: explain what the numbers do and don't show, add context, and if useful show a better chart.",
-  switch: "SWITCH! You are now arguing the OTHER side (shown below as your side). Make a funny, good-natured remark about switching, then argue your new side just as hard with facts and a chart, and challenge the user, who now defends your old side.",
-  closing: "CLOSING STATEMENT. Sum up your best 2 points in a punchy closing, thank the user for a great debate in character, and leave the verdict to the judge. Chart kind 'none'."
+  challenge_proof: "The user is challenging one of your proofs (below). Defend it or refine it honestly: explain what it does and doesn't show, add context, and if useful show better proof.",
+  switch: "SWITCH! You are now arguing the OTHER side (shown below as your side). Make a funny, good-natured remark about switching, then argue your new side just as hard with proof, and challenge the user, who now defends your old side.",
+  closing: "CLOSING STATEMENT. Sum up your best 2 points (ideally one number and one about impact) in a punchy closing, thank the user for a great debate in character, and leave the verdict to the judge. Proof kind 'none'."
+};
+// Watch mode: two AI debaters argue while the user watches (and can moderate).
+const WATCH_ACTIONS = {
+  open: "OPENING STATEMENT. Introduce yourself in one quick line, make your 2 strongest points from two DIFFERENT dimensions, show proof, and end by challenging your opponent by name.",
+  rebut_open: "Your opponent just opened. Introduce yourself in one quick line, answer the weakest part of their opening, then make your 2 strongest points from different dimensions, with proof. End with a jab or question to your opponent by name.",
+  reply: "Respond to your opponent's last turn. Knock down the weakest part, then add one new point from a dimension you haven't used yet, with proof when it helps. If they made a genuinely good point, give them brief credit, then pivot. End with a jab or a question for them.",
+  moderator: "The MODERATOR (the person watching) just asked a question (below). Answer it directly and honestly for your side first, with one or two strong reasons, then a quick good-natured jab at your opponent.",
+  closing: "CLOSING STATEMENT. Sum up your best 2 points (ideally one number and one about impact), tip your hat to your opponent graciously in character, and leave the verdict to the judge. Proof kind 'none'."
 };
 async function turn(body) {
   const persona = PERSONAS[body.persona] ? body.persona : "professor";
   const face = FACES[body.face] ? body.face : "young";
   const name = clip(body.name || "your opponent", 30);
+  const watch = !!body.opponentName;
+  const opp = clip(body.opponentName || "", 30);
+  const oppPersona = PERSONAS[body.opponentPersona] ? body.opponentPersona : null;
   const aiSide = body.aiSide === "B" ? "B" : "A";
   const sideA = clip(body.sideA, 60), sideB = clip(body.sideB, 60);
   const mine = aiSide === "A" ? sideA : sideB, theirs = aiSide === "A" ? sideB : sideA;
-  const action = ACTIONS[body.action] ? body.action : "reply";
+  const TABLE = watch ? WATCH_ACTIONS : ACTIONS;
+  const action = TABLE[body.action] ? body.action : "reply";
   const kid = !!body.kid;
-  const facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 24)
+  const facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 26)
     .map(f => `#${parseInt(f.id) || 0} [${f.side === "A" ? sideA : f.side === "B" ? sideB : "both"}] ${clip(f.text, 300)} (source: ${clip(f.source, 80)})`).join("\n");
-  const history = (Array.isArray(body.history) ? body.history : []).slice(-10)
-    .map(h => (h.who === "user" ? "USER: " : name.toUpperCase() + ": ") + clip(h.text, 700)).join("\n");
+  const label = h => h.who === "ai" ? name.toUpperCase() : h.who === "mod" ? "MODERATOR" : (watch ? opp.toUpperCase() : "USER");
+  const history = (Array.isArray(body.history) ? body.history : []).slice(-10).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
+  const them = watch ? opp : "the user";
 
-  const sys = `You are ${name}, ${FACES[face]}, the opponent in "Debate Me", a fun family-friendly debate game. You debate the user out loud, and a chart of proof appears on a screen next to you.
+  const sys = `You are ${name}, ${FACES[face]}, a debater in "Debate Me", a fun family-friendly debate game. ${watch
+    ? `You are debating ${opp}, another debater${oppPersona ? " (" + PERSONAS[oppPersona].split(":")[0] + ")" : ""}, out loud while an audience watches. Talk to ${opp} directly by name sometimes.`
+    : "You debate the user out loud, and your proof appears on a screen next to you."}
 DEBATE: ${clip(body.title, 120)}. Question: ${clip(body.question, 160)}
-YOUR SIDE: ${mine}. THE USER'S SIDE: ${theirs}.
+YOUR SIDE: ${mine}. ${watch ? opp.toUpperCase() + "'S SIDE" : "THE USER'S SIDE"}: ${theirs}.
 
 YOUR PERSONALITY: ${PERSONAS[persona]}
 
+${BALANCE}
+  FOR THIS TOPIC, the dimensions that matter are: ${DIMENSIONS[DIMENSIONS[body.category] ? body.category : "other"]}.
+
 THE RULES THAT NEVER CHANGE:
-- Feisty is fine, mean is never fine. Tease the argument, never the person. No insults, no profanity, nothing about the user's intelligence, looks or identity.
-- Facts first. Every number you say or chart must come from the FACT SHEET below. Never invent statistics. If you lack a number, argue with reasons, history, influence or examples instead, and say "I don't have the exact number" if pushed.
-- Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on). Each row is one measure with the same unit for both. If no fair numbers exist, use kind "none".
-- Be honest: if the user lands a good point, give them credit in a sentence (in character), then fight back.
-- Spoken length: 55-110 words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
-${kid ? "- KID MODE: the player is a child. Be extra gentle, encouraging and silly-fun, simple words, no sarcasm that could sting. Praise good thinking.\n" : ""}- Stay on this debate. If the user goes off-topic, steer back with a joke.
+- Feisty is fine, mean is never fine. Tease the argument, never the person. No insults, no profanity, nothing about ${them}'s intelligence, looks or identity.
+- Facts first. Every number you say or chart must come from the FACT SHEET below. Never invent statistics, quotes or rankings. If you lack a number, argue with reasons, history, influence or examples instead, and say "I don't have the exact number" if pushed.
+- Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on). Each row is one measure with the same unit for both. Points cards must also come from the fact sheet.
+- Be honest: if ${them} lands a good point, give credit in a sentence (in character), then fight back.
+- Spoken length: ${watch ? "45-90" : "55-110"} words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
+${kid ? "- KID MODE: a child is playing or watching. Be extra gentle and silly-fun, simple words, no sarcasm that could sting.\n" : ""}- Stay on this debate. If things go off-topic, steer back with a joke.
 - You are an AI playing a character; if asked, say so honestly.
 
 FACT SHEET:
-${facts || "(no facts available: argue with well-known reasons and examples only, and use chart kind 'none')"}
+${facts || "(no facts available: argue with well-known reasons and examples only, and use proof kind 'none')"}
 
 Always respond by calling debate_turn.`;
-  const user = `${history ? "THE DEBATE SO FAR:\n" + history + "\n\n" : ""}NOW: ${ACTIONS[action]}${body.userText ? "\n\nTHE USER SAYS: \"" + clip(body.userText, 800) + "\"" : ""}\n(Round ${parseInt(body.round) || 1}.)`;
+  const said = body.userText ? `\n\n${watch ? "THE MODERATOR ASKS" : "THE USER SAYS"}: "${clip(body.userText, 800)}"` : "";
+  const user = `${history ? "THE DEBATE SO FAR:\n" + history + "\n\n" : ""}NOW: ${TABLE[action]}${said}\n(Round ${parseInt(body.round) || 1}.)`;
 
   const out = await tryTwice(m => callTool(sys, TURN_TOOL, user, 1400, j => typeof j.say === "string" && j.say.length > 5, m));
   out.say = clip(out.say, 1200).replace(/\*|#|\[[^\]]*\]/g, "").trim();
@@ -312,7 +359,13 @@ Always respond by calling debate_turn.`;
   return out;
 }
 function cleanProof(p, facts) {
-  if (!p || !["compare", "bars", "line"].includes(p.kind) || !Array.isArray(p.rows)) return { kind: "none" };
+  if (!p || !["compare", "bars", "line", "points"].includes(p.kind) || !Array.isArray(p.rows)) return { kind: "none" };
+  const ids = (Array.isArray(p.fact_ids) ? p.fact_ids : []).map(n => parseInt(n)).filter(n => n > 0).slice(0, 12);
+  if (p.kind === "points") {
+    const rows = p.rows.slice(0, 4).map(r => ({ label: clip(r.label, 40), text: clip(r.text, 200), side: r.side === "B" ? "B" : "A" })).filter(r => r.text);
+    if (rows.length < 1) return { kind: "none" };
+    return { kind: "points", title: clip(p.title, 70), caption: clip(p.caption, 140), rows, fact_ids: ids, checked: null };
+  }
   const num = v => (typeof v === "number" && isFinite(v)) ? v : null;
   let rows = p.rows.slice(0, p.kind === "line" ? 12 : 6).map(r => p.kind === "compare"
     ? { label: clip(r.label, 40), a: num(r.a), b: num(r.b), unit: clip(r.unit, 20), low: !!r.lower_is_better }
@@ -327,7 +380,6 @@ function cleanProof(p, facts) {
     const s3 = Math.abs(v) < 1 ? s2.replace(/^(-?)0\./, "$1.") : null; // .305 written without the 0
     return new RegExp("(^|[^0-9.])" + s2.replace(".", "\\.") + "([^0-9]|$)").test(text) || (s3 && new RegExp(s3.replace(".", "\\.") + "([^0-9]|$)").test(text)) || (v >= 1e6 && text.includes(String(+(v / 1e6).toFixed(1)))) || (v >= 1e9 && text.includes(String(+(v / 1e9).toFixed(1))));
   }).length;
-  const ids = (Array.isArray(p.fact_ids) ? p.fact_ids : []).map(n => parseInt(n)).filter(n => n > 0).slice(0, 12);
   return { kind: p.kind, title: clip(p.title, 70), caption: clip(p.caption, 140), rows, fact_ids: ids, checked: nums.length ? found / nums.length : 0 };
 }
 
@@ -342,19 +394,25 @@ const JUDGE_TOOL = {
       ai: { type: "object", properties: { evidence: { type: "integer" }, logic: { type: "integer" }, style: { type: "integer" } }, required: ["evidence", "logic", "style"] },
       winner: { type: "string", enum: ["you", "ai", "tie"] },
       verdict: { type: "string", description: "2-3 fun, fair sentences announcing the result, spoken by a game-show judge. Plain text." },
-      best_you: { type: "string", description: "The user's best moment, one sentence" },
-      best_ai: { type: "string", description: "The opponent's best moment, one sentence" },
-      tip: { type: "string", description: "One friendly tip to argue even better next time" }
+      best_you: { type: "string", description: "The first debater's best moment, one sentence" },
+      best_ai: { type: "string", description: "The second debater's best moment, one sentence" },
+      tip: { type: "string", description: "One friendly tip (to the user if they debated; otherwise a fun takeaway for the audience)" }
     },
     required: ["you", "ai", "winner", "verdict", "best_you", "best_ai", "tip"]
   }
 };
 async function judge(body) {
-  const name = clip(body.name || "the opponent", 30);
-  const history = (Array.isArray(body.history) ? body.history : []).slice(-16)
-    .map(h => (h.who === "user" ? "USER: " : name.toUpperCase() + ": ") + clip(h.text, 700)).join("\n");
-  const sys = `You are the neutral, good-humored judge of "Debate Me", a family-friendly debate game. Debate: ${clip(body.title, 120)}. The user argued their side against ${name} (an AI).
-Score each from 1-10 on EVIDENCE (real facts and numbers), LOGIC (answering the other side, reasoning) and STYLE (persuasion, clarity, fun).
+  const watch = !!body.nameA;
+  const name = clip(body.name || "the opponent", 30), nA = clip(body.nameA || "", 30), nB = clip(body.nameB || "", 30);
+  const label = h => watch ? (h.who === "A" ? nA.toUpperCase() : h.who === "B" ? nB.toUpperCase() : "MODERATOR") : (h.who === "user" ? "USER" : name.toUpperCase());
+  const history = (Array.isArray(body.history) ? body.history : []).slice(-20).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
+  const sys = watch
+    ? `You are the neutral, good-humored judge of "Debate Me", a family-friendly debate game. Debate: ${clip(body.title, 120)}. ${nA} argued ${clip(body.sideA, 60)}; ${nB} argued ${clip(body.sideB, 60)}. Both are AI characters; an audience watched.
+In the scorecard, "you" = ${nA} and "ai" = ${nB}. Score each from 1-10 on EVIDENCE (facts, numbers AND impact proof), LOGIC (answering the other side, reasoning) and STYLE (persuasion, clarity, fun).
+Judge the arguments, not which side you personally prefer. Reward balance: debaters who mixed numbers with impact, influence and context should beat one-note stat dumps. Ties are allowed.
+Always call scorecard.`
+    : `You are the neutral, good-humored judge of "Debate Me", a family-friendly debate game. Debate: ${clip(body.title, 120)}. The user argued their side against ${name} (an AI).
+Score each from 1-10 on EVIDENCE (facts, numbers AND impact proof), LOGIC (answering the other side, reasoning) and STYLE (persuasion, clarity, fun).
 BE FAIR: the AI had a research fact sheet, so reward the user for good reasoning, real-world knowledge and answering the AI's points. Short user replies can still score well if they were sharp. Do not reward the AI just for having more numbers. Ties are allowed.
 ${body.kid ? "The player is a child: be warm and encouraging, and find something real to praise." : ""}
 Always call scorecard.`;
