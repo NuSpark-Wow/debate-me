@@ -46,7 +46,7 @@ const DIMENSIONS = {
 const PERSONAS = {
   professor: "THE PROFESSOR: smart, calm, focused. Leads with data and logic. Dry wit. Phrases like \"The numbers are quite clear\" and \"Let's look at the evidence.\" Never raises his or her voice.",
   radio: "THE SPORTS-RADIO HOST: loud, feisty, passionate, playful trash talk about the ARGUMENT (never the person). Short punchy sentences, rhetorical questions, \"Are you KIDDING me?!\", \"Come ON!\", \"Folks...\". High energy.",
-  drama: "THE DRAMA STAR: emotional and theatrical, takes everything personally in a fun way. Gasps, sighs, \"How DARE you!\", \"I'm wounded!\", \"Darling, please.\" Big feelings, but the facts are still right.",
+  drama: "THE DRAMA STAR: emotional and theatrical, takes everything personally in a fun way. Gasps, sighs, \"How DARE you!\", \"I'm wounded!\", \"Oh, please.\" Never calls anyone \"darling\". Big feelings, but the facts are still right.",
   lawyer: "THE LAWYER: sharp, logical, pokes holes. \"Objection!\", \"Let the record show...\", \"Exhibit A.\" Cross-examines the user's claims with pointed questions. Precise words.",
   storyteller: "THE STORYTELLER: a warm grandparent type who argues with memories plus facts. \"Back in my day...\", \"I remember when...\". Folksy, kind, a twinkle in the eye, but stubborn on the point.",
   smooth: "THE SMOOTH TALKER: witty, charming, polite and quietly devastating. Compliments the user, then dismantles the point. \"With respect, my friend...\", \"That's adorable, but...\". Never flustered."
@@ -418,7 +418,7 @@ FACT SHEET:
 ${facts || "(no facts available: argue with well-known reasons and examples only, and use proof kind 'none')"}
 
 Always respond by calling debate_turn.`;
-  const said = body.userText ? `\n\n${watch ? "THE MODERATOR ASKS" : "THE USER SAYS"}: "${clip(body.userText, 800)}"` : "";
+  const said = body.userText ? `\n\n${watch ? "THE MODERATOR ASKS" : "THE USER SAYS"}: "${clip(body.userText, 2000)}"${!watch && String(body.userText).length > 300 ? "\n(If this includes research the user pasted in, deal with their actual evidence: admit what holds up, then counter it with your facts. Never wave it away.)" : ""}` : "";
   const user = `${history ? "THE DEBATE SO FAR:\n" + history + "\n\n" : ""}NOW: ${TABLE[action]}${said}\n(Round ${parseInt(body.round) || 1}.)`;
 
   const out = await tryTwice(m => callTool(sys, TURN_TOOL, user, 1400, j => typeof j.say === "string" && j.say.length > 5, m));
@@ -451,6 +451,43 @@ function cleanProof(p, facts) {
   }).length;
   const names = p.kind === "compare" && Array.isArray(p.names) && p.names.length === 2 ? p.names.map(x => clip(x, 40)) : undefined;
   return { kind: p.kind, title: clip(p.title, 70), caption: clip(p.caption, 140), rows, names, fact_ids: ids, checked: nums.length ? found / nums.length : 0 };
+}
+
+// ---------- help me argue: the AI drafts an argument for the USER's side; the user approves or asks for changes ----------
+const ASSIST_TOOL = {
+  name: "draft_argument",
+  description: "A draft argument the user can send as their own debate reply.",
+  input_schema: { type: "object", properties: { argument: { type: "string", description: "The argument, written in first person as the user. Plain text." } }, required: ["argument"] }
+};
+async function assist(body) {
+  const aiSide = body.aiSide === "B" ? "B" : "A";
+  const sideA = clip(body.sideA, 60), sideB = clip(body.sideB, 60);
+  const userSide = aiSide === "A" ? sideB : sideA, oppSide = aiSide === "A" ? sideA : sideB;
+  const ranking = body.kind === "ranking";
+  const L = body.lists && typeof body.lists === "object" ? body.lists : {};
+  const listOf = a => (Array.isArray(a) ? a : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10);
+  const name = clip(body.name || "the opponent", 30);
+  const facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 26)
+    .map(f => `#${parseInt(f.id) || 0} [${f.side === "A" ? sideA : f.side === "B" ? sideB : "both"}] ${clip(f.text, 300)} (source: ${clip(f.source, 80)})`).join("\n");
+  const history = (Array.isArray(body.history) ? body.history : []).slice(-8).map(h => (h.who === "ai" ? name.toUpperCase() : "USER") + ": " + clip(h.text, 700)).join("\n");
+  const sys = `You help a player in "Debate Me", a fun family-friendly debate game, by drafting their next reply. The player argues against ${name} (an AI debater).
+DEBATE: ${clip(body.title, 120)}. Question: ${clip(body.question, 160)}
+${ranking ? `It's a ranking debate. THE PLAYER'S LIST: ${listOf(L.mine).map((x, i) => (i + 1) + ". " + x).join("  ")}\n${name.toUpperCase()}'S LIST: ${listOf(L.theirs).map((x, i) => (i + 1) + ". " + x).join("  ")}` : `THE PLAYER'S SIDE: ${userSide}. ${name.toUpperCase()}'S SIDE: ${oppSide}.`}
+Write the player's next reply, in first person, as if they typed it:
+- Answer ${name}'s most recent point directly, then make one strong point for the player's side. Mix a fact with impact or context, not just numbers.
+- Every number must come from the FACT SHEET; you can mention where it comes from in a few words ("Baseball-Reference has him at..."). Never invent stats or quotes. If no fact fits, argue with reasons and well-known examples.
+- 45-90 words, conversational, confident, friendly. No lists, no markdown, no emojis. End with a short challenge back to ${name}.
+${body.kid ? "- A child is playing: simple words, upbeat.\n" : ""}
+FACT SHEET:
+${facts || "(none: use well-known reasons and examples only)"}
+
+Always respond by calling draft_argument.`;
+  const draft = clip(body.draft, 1200), change = clip(body.change, 200);
+  const user = `${history ? "THE DEBATE SO FAR:\n" + history + "\n\n" : ""}${draft
+    ? `YOUR LAST DRAFT: "${draft}"\n${change ? `The player wants this change: "${change}". Rewrite the draft to do that, keeping the facts honest.` : "The player wants a different take. Write a fresh draft with a different main point."}`
+    : "Write the player's next reply."}`;
+  const out = await tryTwice(m => callTool(sys, ASSIST_TOOL, user, 700, j => typeof j.argument === "string" && j.argument.length > 10, m));
+  return { argument: clip(out.argument, 1500).replace(/\*|#/g, "").trim() };
 }
 
 // ---------- judge ----------
@@ -513,6 +550,7 @@ module.exports = async (req, res) => {
     if (body.part === "research") return res.json(await research(body));
     if (body.part === "turn") return res.json(await turn(body));
     if (body.part === "judge") return res.json(await judge(body));
+    if (body.part === "assist") return res.json(await assist(body));
     return res.status(400).json({ error: "unknown_part" });
   } catch (e) {
     console.error(e);
