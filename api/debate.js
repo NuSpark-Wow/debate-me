@@ -108,7 +108,11 @@ const SETUP_TOOL = {
     properties: {
       ok: { type: "boolean" },
       reason: { type: "string", description: "If ok is false: one friendly sentence explaining, and suggest a fun alternative topic." },
-      kind: { type: "string", enum: ["versus", "claim", "yesno"], description: "versus = two named things/people; claim = for vs against one claim; yesno = a yes/no question" },
+      kind: { type: "string", enum: ["versus", "claim", "yesno", "ranking"], description: "versus = two named things/people; claim = for vs against one claim; yesno = a yes/no question; ranking = a top-N list" },
+      size: { type: "integer", description: "ranking only: how many spots (3-10)" },
+      list: { type: "array", items: { type: "string" }, description: "ranking only, when the user ATTACHED a ranked list: the names exactly as listed, in order (#1 first). Otherwise empty." },
+      summary: { type: "string", description: "Only when something was attached: one sentence describing it, e.g. 'A Facebook post ranking the top 10 third basemen of all time'" },
+      points: { type: "array", items: { type: "string" }, description: "Only when an article or post was attached: its 3-6 main claims or arguments, in short sentences" },
       title: { type: "string", description: "Short title, e.g. 'Prince vs Michael Jackson'" },
       question: { type: "string", description: "The debate question, e.g. 'Who was the greater artist?'" },
       category: { type: "string", enum: Object.keys(SITES) },
@@ -121,8 +125,9 @@ const SETUP_TOOL = {
   }
 };
 async function setup(body) {
-  const topic = clip(body.topic, 200).trim();
-  if (!topic) throw new Error("empty");
+  const topic = clip(body.topic, 300).trim();
+  const at = body.attach && typeof body.attach === "object" ? body.attach : null;
+  if (!topic && !at) throw new Error("empty");
   const sys = `You set up friendly, fun debates for a family-friendly debate game (kids, adults and seniors play). Turn the user's topic into exactly two clear sides.
 Decide which kind of debate the user typed, and NEVER turn a claim about one thing into a comparison with something they didn't name:
 - "X vs Y" (two things named): sideA = X, sideB = Y.
@@ -130,16 +135,34 @@ Decide which kind of debate the user typed, and NEVER turn a claim about one thi
 - Yes/no questions ("Is a hot dog a sandwich?", "Should Pete Rose be in the Hall of Fame?"): sides "Yes, ..." / "No, ..." in a few words.
 - OPEN questions with no candidate named ("Who's the best 3rd baseman ever?", "What's the greatest movie of all time?"): pick the two strongest, most debated candidates (e.g. Mike Schmidt vs George Brett).
 - A line starting "Claim:" is always a FOR vs AGAINST debate about that claim (kind "claim").
+- RANKINGS ("Top 5 ___", "Top 10 ___", "rank the best ___", or an attached ranked list): kind "ranking", size = N (default 5, max 10), title like "Top 10 Third Basemen of All Time", question like "Who belongs in the top 10, and in what order?", sideA "The list", sideB "Challenger list".
+- ATTACHMENTS: if the user attached a screenshot, post, article or file, read it carefully. A ranked list = kind "ranking" with list = the names exactly as written, in order (size = its length, max 10). An article or post that argues something = kind "claim" (FOR vs AGAINST its main argument), with summary and points. Something that compares two things = kind "versus". Fill summary in every attachment case.
 For FOR/AGAINST and yes/no debates, metrics and searches should cover the subject itself and how it stacks up against the field.
 ${DECLINE_TOPICS}
 Metrics must be BALANCED for the category, never only statistics. For example, sports = stats plus clutch and postseason, championships, peak dominance, impact on the game, era context, and peers' opinions; music = sales plus influence, innovation, critics' rankings, live performance; homes and products = cost plus durability, comfort, upkeep.
 Searches: 2 for the key numbers, 2 for the impact side (clutch moments, influence, legacy, critics' or experts' rankings, peer quotes).
 If ok is false, still fill the other fields with a fun safe alternative topic.
 Always call frame_debate.`;
-  const out = await callTool(sys, SETUP_TOOL, `Topic: ${topic}${body.kid ? "\n(The player is a kid. Keep it kid-friendly.)" : ""}`, 700,
-    j => typeof j.ok === "boolean" && j.sideA && j.sideB, FAST);
+  const note = `${topic ? "Topic: " + topic : "Topic: (see the attachment)"}${body.kid ? "\n(The player is a kid. Keep it kid-friendly.)" : ""}`;
+  let user = note;
+  if (at) {
+    const tell = "\n\nThe user ATTACHED the item above and wants to debate it." + (topic ? " Their note about what to debate: " + topic : "") + " Read it and frame the debate from it.";
+    if (at.type === "image" && at.data) user = [{ type: "image", source: { type: "base64", media_type: /^image\/(png|jpeg|gif|webp)$/.test(at.media_type) ? at.media_type : "image/jpeg", data: String(at.data) } }, { type: "text", text: note + tell }];
+    else if (at.type === "pdf" && at.data) user = [{ type: "document", source: { type: "base64", media_type: "application/pdf", data: String(at.data) } }, { type: "text", text: note + tell }];
+    else if (at.text) user = `ATTACHED TEXT:\n"""\n${clip(at.text, 20000).replace(/"""/g, "")}\n"""\n\n${note}${tell}`;
+  }
+  const out = await callTool(sys, SETUP_TOOL, user, 1400,
+    j => typeof j.ok === "boolean" && j.sideA && j.sideB, at ? MODEL : FAST);
   out.metrics = (out.metrics || []).slice(0, 6).map(s => clip(s, 60));
   out.searches = (out.searches || []).slice(0, 4).map(s => clip(s, 120));
+  if (out.kind === "ranking") {
+    out.size = Math.max(3, Math.min(10, parseInt(out.size) || (Array.isArray(out.list) && out.list.length) || 5));
+    out.list = (Array.isArray(out.list) ? out.list : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10);
+    if (out.list.length) out.size = out.list.length;
+    out.sideA = "The list"; out.sideB = "Challenger list";
+  } else { delete out.list; delete out.size; }
+  out.summary = at ? clip(out.summary || "", 200) : "";
+  out.points = at ? (Array.isArray(out.points) ? out.points : []).slice(0, 6).map(x => clip(x, 200)) : [];
   return out;
 }
 
@@ -185,7 +208,9 @@ const FACT_TOOL = {
           },
           required: ["side", "text", "src"]
         }
-      }
+      },
+      ranking: { type: "array", items: { type: "object", properties: { name: { type: "string" }, reason: { type: "string" } }, required: ["name"] }, description: "Ranking debates only: the best-supported top N, #1 first, each with a one-line reason" },
+      alt_ranking: { type: "array", items: { type: "object", properties: { name: { type: "string" }, reason: { type: "string" } }, required: ["name"] }, description: "Ranking debates only: a credible CHALLENGER top N that a smart rival would argue for (2-4 different names or a clearly different order), #1 first, each with a one-line reason" }
     },
     required: ["facts"]
   }
@@ -193,7 +218,10 @@ const FACT_TOOL = {
 async function research(body) {
   const title = clip(body.title, 120), sideA = clip(body.sideA, 60), sideB = clip(body.sideB, 60);
   const cat = SITES[body.category] ? body.category : "other";
-  const ck = (title + "|" + sideA + "|" + sideB).toLowerCase();
+  const ranking = body.kind === "ranking";
+  const size = Math.max(3, Math.min(10, parseInt(body.size) || 5));
+  const given = (Array.isArray(body.list) ? body.list : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10);
+  const ck = (title + "|" + sideA + "|" + sideB + "|" + given.join(",")).toLowerCase();
   if (researchCache.has(ck)) return researchCache.get(ck);
 
   const sites = SITES[cat];
@@ -204,11 +232,12 @@ async function research(body) {
 
   const jobs = searches.map(q => serper(q + " " + siteFilter));
   jobs.push(serper(title + " comparison facts"));
-  const [results, wa, wb] = await Promise.all([Promise.all(jobs), wikiSummary(sideA), wikiSummary(sideB)]);
+  if (ranking) given.slice(0, 3).forEach(n => jobs.push(serper(n + " career legacy " + siteFilter)));
+  const [results, wa, wb] = await Promise.all([Promise.all(jobs), ranking ? null : wikiSummary(sideA), ranking ? null : wikiSummary(sideB)]);
 
   const snips = [], seen = new Set();
   const add = (title, link, snippet) => {
-    if (!snippet || snips.length >= 34) return;
+    if (!snippet || snips.length >= (ranking ? 44 : 34)) return;
     const k = (link || title) + "|" + snippet.slice(0, 40);
     if (seen.has(k)) return; seen.add(k);
     snips.push({ title: clip(title, 120), link: clip(link, 400), snippet: clip(snippet, 900) });
@@ -226,7 +255,10 @@ async function research(body) {
   }
 
   const list = snips.map((s, i) => `[S${i + 1}] ${s.title} (${s.link})\n${s.snippet}`).join("\n\n");
-  const sys = `You are a careful fact checker preparing a fact sheet for a friendly debate: "${title}". Side A = ${sideA}. Side B = ${sideB}.
+  const rankNote = ranking ? `
+THIS IS A RANKING DEBATE (top ${size}). Facts should cover the strongest candidates: ${given.length ? "everyone on the attached list (" + given.join(", ") + ")" : "the likely top " + size} PLUS 3-5 strong names who are often left off. Use side "both" for these facts and name the person or item in each fact.
+${given.length ? "Set ranking to the attached list exactly, in order: " + given.join(", ") + ". Then set alt_ranking to a credible challenger top " + given.length + "." : "Set ranking to the best-supported top " + size + " from the research, and alt_ranking to a credible challenger top " + size + "."}` : "";
+  const sys = `You are a careful fact checker preparing a fact sheet for a friendly debate: "${title}". ${ranking ? "" : "Side A = " + sideA + ". Side B = " + sideB + "."}${rankNote}${body.source ? "\nThe user attached something to debate: " + clip(body.source, 900) : ""}
 Pull 14-22 short, checkable facts that each side could use, BALANCED across these kinds (aim for some of each that the snippets support):
   1) numbers: records, stats, sales, chart hits, box office, prices, nutrition, survey results;
   2) impact and influence: who they inspired or changed, what came after, peer and expert quotes (with who said it);
@@ -238,17 +270,23 @@ You may add up to 4 widely known facts with src 0 if the snippets miss something
 Balance: give both sides real ammunition.
 Always call fact_sheet.`;
   const user = snips.length ? `RESEARCH SNIPPETS:\n\n${list}` : `No web results were available. Give 10-14 widely known, well-established facts for both sides (src 0 for all). No invented statistics; skip numbers you are not sure about.`;
-  let facts = [];
+  let facts = [], rankOut = [], altOut = [];
   try {
-    const out = await callTool(sys, FACT_TOOL, user, 2400, j => Array.isArray(j.facts), FAST);
-    facts = out.facts.slice(0, 22).map((f, i) => {
+    const out = await callTool(sys, FACT_TOOL, user, ranking ? 3600 : 2400, j => Array.isArray(j.facts), FAST);
+    const cleanList = l => (Array.isArray(l) ? l : []).map(x => ({ name: clip(x && x.name, 60), reason: clip(x && x.reason, 160) })).filter(x => x.name).slice(0, size);
+    if (ranking) { rankOut = given.length ? given.map((n, i) => ({ name: n, reason: ((cleanList(out.ranking)[i] || {}).reason) || "" })) : cleanList(out.ranking); altOut = cleanList(out.alt_ranking); }
+    facts = out.facts.slice(0, ranking ? 26 : 22).map((f, i) => {
       const s = f.src > 0 && snips[f.src - 1] ? snips[f.src - 1] : null;
       return { id: i + 1, side: ["A", "B", "both"].includes(f.side) ? f.side : "both", text: clip(f.text, 300), source: s ? s.title : "General knowledge", url: s ? s.link : "" };
     });
   } catch (e) { facts = []; }
   const out = { facts, web: webOn && snips.length > 0, searched: sites.slice(0, 6) };
+  if (ranking) {
+    if (!rankOut.length && given.length) rankOut = given.map(n => ({ name: n, reason: "" }));
+    out.ranking = rankOut; out.alt = altOut.length ? altOut : rankOut.slice().reverse();
+  }
   if (researchCache.size > 300) researchCache.clear();
-  if (facts.length) researchCache.set(ck, out);
+  if (facts.length && (!ranking || out.ranking.length)) researchCache.set(ck, out);
   return out;
 }
 
@@ -281,6 +319,7 @@ const TURN_TOOL = {
               required: ["label"]
             }
           },
+          names: { type: "array", items: { type: "string" }, description: "RANKING debates, compare charts only: the two people or items being compared, [first, second]; a = first, b = second" },
           fact_ids: { type: "array", items: { type: "integer" }, description: "The fact sheet ids the proof came from" }
         },
         required: ["kind"]
@@ -303,6 +342,16 @@ const ACTIONS = {
   switch: "SWITCH! You are now arguing the OTHER side (shown below as your side). Make a funny, good-natured remark about switching, then argue your new side just as hard with proof, and challenge the user, who now defends your old side.",
   closing: "CLOSING STATEMENT. Sum up your best 2 points (ideally one number and one about impact) in a punchy closing, thank the user for a great debate in character, and leave the verdict to the judge. Proof kind 'none'."
 };
+// Ranking debates: moves the user can tap
+const RANK_ACTIONS = {
+  open: "OPENING STATEMENT. Introduce yourself in one quick line, say you're defending YOUR LIST, make the case for your #1 and one other key pick (one with numbers, one with impact), show proof, then challenge the user's list: name the biggest difference between the two lists.",
+  missing: "The user tapped 'Who's missing?' Talk about who's MISSING: name the strongest person or item missing from the user's list and make the case they belong, with proof. If your own list left off someone strong, admit it honestly in a sentence.",
+  shouldnt: "The user tapped 'Who shouldn't be there?' Pick the weakest choice on the user's list (ideally one that isn't on yours) and argue why it doesn't belong in the top spots, with proof. Then defend one of your own picks.",
+  numberone: "The user tapped 'Why is #1 #1?' Defend YOUR #1 pick with your best mix of numbers and impact, with proof. If the user's #1 is different, explain why yours ranks higher.",
+  reply: ACTIONS.reply.replace("their argument", "their argument about the rankings"),
+  proof: ACTIONS.proof, source: ACTIONS.source, unfair: ACTIONS.unfair, challenge_proof: ACTIONS.challenge_proof,
+  closing: "CLOSING STATEMENT. Sum up why your list is the right list in a punchy closing (name your top pick and your most important difference with the user's list), thank the user in character, and leave the verdict to the judge. Proof kind 'none'."
+};
 // Watch mode: two AI debaters argue while the user watches (and can moderate).
 const WATCH_ACTIONS = {
   open: "OPENING STATEMENT. Introduce yourself in one quick line, make your 2 strongest points from two DIFFERENT dimensions, show proof, and end by challenging your opponent by name.",
@@ -321,7 +370,8 @@ async function turn(body) {
   const aiSide = body.aiSide === "B" ? "B" : "A";
   const sideA = clip(body.sideA, 60), sideB = clip(body.sideB, 60);
   const mine = aiSide === "A" ? sideA : sideB, theirs = aiSide === "A" ? sideB : sideA;
-  const TABLE = watch ? WATCH_ACTIONS : ACTIONS;
+  const ranking = body.kind === "ranking";
+  const TABLE = watch ? WATCH_ACTIONS : ranking ? RANK_ACTIONS : ACTIONS;
   const action = TABLE[body.action] ? body.action : "reply";
   const kid = !!body.kid;
   const facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 26)
@@ -329,12 +379,26 @@ async function turn(body) {
   const label = h => h.who === "ai" ? name.toUpperCase() : h.who === "mod" ? "MODERATOR" : (watch ? opp.toUpperCase() : "USER");
   const history = (Array.isArray(body.history) ? body.history : []).slice(-10).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
   const them = watch ? opp : "the user";
+  const L = body.lists && typeof body.lists === "object" ? body.lists : {};
+  const listOf = a => (Array.isArray(a) ? a : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10);
+  const myList = listOf(L.mine), theirList = listOf(L.theirs);
+  const norm = x => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const onlyMine = myList.filter(x => !theirList.some(y => norm(y) === norm(x))), onlyTheirs = theirList.filter(x => !myList.some(y => norm(y) === norm(x)));
+  const rankBlock = ranking ? `
+THIS IS A RANKING DEBATE. You defend YOUR LIST; ${watch ? opp : "the user"} defends THEIR LIST. Argue about who belongs, who's missing, and the order.
+YOUR LIST: ${myList.map((x, i) => (i + 1) + ". " + x).join("  ") || "(build it from the fact sheet)"}
+${watch ? opp.toUpperCase() + "'S" : "THE USER'S"} LIST: ${theirList.map((x, i) => (i + 1) + ". " + x).join("  ") || "(same as yours so far)"}
+${onlyMine.length ? "Only on your list: " + onlyMine.join(", ") + ". " : ""}${onlyTheirs.length ? "Only on theirs: " + onlyTheirs.join(", ") + ". " : ""}${!onlyMine.length && !onlyTheirs.length && theirList.length ? "Same names, so argue about the ORDER, and about who might be missing from both." : ""}
+For compare charts in this debate, set names to the two people or items you compare (a = names[0], b = names[1]).` : "";
+  const sourceBlock = body.source ? `
+THE USER ATTACHED SOMETHING TO DEBATE: ${clip(body.source, 1200)}
+Refer to it naturally ("this post says...", "the article claims...").` : "";
 
   const sys = `You are ${name}, ${FACES[face]}, a debater in "Debate Me", a fun family-friendly debate game. ${watch
     ? `You are debating ${opp}, another debater${oppPersona ? " (" + PERSONAS[oppPersona].split(":")[0] + ")" : ""}, out loud while an audience watches. Talk to ${opp} directly by name sometimes.`
     : "You debate the user out loud, and your proof appears on a screen next to you."}
 DEBATE: ${clip(body.title, 120)}. Question: ${clip(body.question, 160)}
-YOUR SIDE: ${mine}. ${watch ? opp.toUpperCase() + "'S SIDE" : "THE USER'S SIDE"}: ${theirs}.
+${ranking ? rankBlock : `YOUR SIDE: ${mine}. ${watch ? opp.toUpperCase() + "'S SIDE" : "THE USER'S SIDE"}: ${theirs}.`}${sourceBlock}
 
 YOUR PERSONALITY: ${PERSONAS[persona]}
 
@@ -344,7 +408,7 @@ ${BALANCE}
 THE RULES THAT NEVER CHANGE:
 - Feisty is fine, mean is never fine. Tease the argument, never the person. No insults, no profanity, nothing about ${them}'s intelligence, looks or identity.
 - Facts first. Every number you say or chart must come from the FACT SHEET below. Never invent statistics, quotes or rankings. If you lack a number, argue with reasons, history, influence or examples instead, and say "I don't have the exact number" if pushed.
-- Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on). Each row is one measure with the same unit for both. Points cards must also come from the fact sheet.
+- Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. ${ranking ? 'For "compare", fill names with the two you compare; a = names[0], b = names[1].' : `For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on).`} Each row is one measure with the same unit for both. Points cards must also come from the fact sheet.
 - Be honest: if ${them} lands a good point, give credit in a sentence (in character), then fight back.
 - Spoken length: ${watch ? "45-90" : "55-110"} words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
 ${kid ? "- KID MODE: a child is playing or watching. Be extra gentle and silly-fun, simple words, no sarcasm that could sting.\n" : ""}- Stay on this debate. If things go off-topic, steer back with a joke.
@@ -385,7 +449,8 @@ function cleanProof(p, facts) {
     const s3 = Math.abs(v) < 1 ? s2.replace(/^(-?)0\./, "$1.") : null; // .305 written without the 0
     return new RegExp("(^|[^0-9.])" + s2.replace(".", "\\.") + "([^0-9]|$)").test(text) || (s3 && new RegExp(s3.replace(".", "\\.") + "([^0-9]|$)").test(text)) || (v >= 1e6 && text.includes(String(+(v / 1e6).toFixed(1)))) || (v >= 1e9 && text.includes(String(+(v / 1e9).toFixed(1))));
   }).length;
-  return { kind: p.kind, title: clip(p.title, 70), caption: clip(p.caption, 140), rows, fact_ids: ids, checked: nums.length ? found / nums.length : 0 };
+  const names = p.kind === "compare" && Array.isArray(p.names) && p.names.length === 2 ? p.names.map(x => clip(x, 40)) : undefined;
+  return { kind: p.kind, title: clip(p.title, 70), caption: clip(p.caption, 140), rows, names, fact_ids: ids, checked: nums.length ? found / nums.length : 0 };
 }
 
 // ---------- judge ----------
@@ -401,7 +466,8 @@ const JUDGE_TOOL = {
       verdict: { type: "string", description: "2-3 fun, fair sentences announcing the result, spoken by a game-show judge. Plain text." },
       best_you: { type: "string", description: "The first debater's best moment, one sentence" },
       best_ai: { type: "string", description: "The second debater's best moment, one sentence" },
-      tip: { type: "string", description: "One friendly tip (to the user if they debated; otherwise a fun takeaway for the audience)" }
+      tip: { type: "string", description: "One friendly tip (to the user if they debated; otherwise a fun takeaway for the audience)" },
+      compromise: { type: "array", items: { type: "string" }, description: "RANKING debates only: the judge's compromise top list (same length), #1 first, blending the strongest arguments from both sides" }
     },
     required: ["you", "ai", "winner", "verdict", "best_you", "best_ai", "tip"]
   }
@@ -421,7 +487,10 @@ Score each from 1-10 on EVIDENCE (facts, numbers AND impact proof), LOGIC (answe
 BE FAIR: the AI had a research fact sheet, so reward the user for good reasoning, real-world knowledge and answering the AI's points. Short user replies can still score well if they were sharp. Do not reward the AI just for having more numbers. Ties are allowed.
 ${body.kid ? "The player is a child: be warm and encouraging, and find something real to praise." : ""}
 Always call scorecard.`;
-  const out = await callTool(sys, JUDGE_TOOL, `TRANSCRIPT:\n${history}`, 900, j => j.you && j.ai && j.verdict, FAST);
+  const ranking = body.kind === "ranking" && body.lists;
+  const lists = ranking ? `\n\nTHIS WAS A RANKING DEBATE. ${watch ? nA : "The user"}'s list: ${(body.lists.first || []).slice(0, 10).map((x, i) => (i + 1) + ". " + clip(x, 60)).join("  ")}\n${watch ? nB : name}'s list: ${(body.lists.second || []).slice(0, 10).map((x, i) => (i + 1) + ". " + clip(x, 60)).join("  ")}\nAlso give a compromise list of the same length that blends the strongest arguments.` : "";
+  const out = await callTool(sys, JUDGE_TOOL, `TRANSCRIPT:\n${history}${lists}`, 1100, j => j.you && j.ai && j.verdict, FAST);
+  out.compromise = ranking ? (Array.isArray(out.compromise) ? out.compromise : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10) : [];
   const fix = o => ({ evidence: Math.max(1, Math.min(10, parseInt(o.evidence) || 5)), logic: Math.max(1, Math.min(10, parseInt(o.logic) || 5)), style: Math.max(1, Math.min(10, parseInt(o.style) || 5)) });
   out.you = fix(out.you); out.ai = fix(out.ai);
   const ty = out.you.evidence + out.you.logic + out.you.style, ta = out.ai.evidence + out.ai.logic + out.ai.style;
