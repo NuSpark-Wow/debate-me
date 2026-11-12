@@ -123,9 +123,12 @@ async function setup(body) {
   const topic = clip(body.topic, 200).trim();
   if (!topic) throw new Error("empty");
   const sys = `You set up friendly, fun debates for a family-friendly debate game (kids, adults and seniors play). Turn the user's topic into exactly two clear sides.
-- "X vs Y" topics: sideA = X, sideB = Y.
-- "Best ___ ever" topics: pick the two strongest, most debated candidates (e.g. best 3rd baseman: Mike Schmidt vs George Brett).
-- Yes/no topics ("Is a hot dog a sandwich?"): sides like "Yes, it is" / "No, it isn't".
+Decide which kind of debate the user typed, and NEVER turn a claim about one thing into a comparison with something they didn't name:
+- "X vs Y" (two things named): sideA = X, sideB = Y.
+- A CLAIM OR OPINION about one thing ("The Godfather is the greatest movie", "Pizza is overrated", "Jordan is the GOAT"): a FOR vs AGAINST debate. title = the claim as a question ("Is The Godfather the greatest movie ever?"), sideA = short FOR label ("Yes, it's #1"), sideB = short AGAINST label ("No, it's not"). Do not pick a rival for side B; the AGAINST side may mention rivals while arguing.
+- Yes/no questions ("Is a hot dog a sandwich?", "Should Pete Rose be in the Hall of Fame?"): sides "Yes, ..." / "No, ..." in a few words.
+- OPEN questions with no candidate named ("Who's the best 3rd baseman ever?", "What's the greatest movie of all time?"): pick the two strongest, most debated candidates (e.g. Mike Schmidt vs George Brett).
+For FOR/AGAINST and yes/no debates, metrics and searches should cover the subject itself and how it stacks up against the field.
 ${DECLINE_TOPICS}
 Metrics must be BALANCED for the category, never only statistics. For example, sports = stats plus clutch and postseason, championships, peak dominance, impact on the game, era context, and peers' opinions; music = sales plus influence, innovation, critics' rankings, live performance; homes and products = cost plus durability, comfort, upkeep.
 Searches: 2 for the key numbers, 2 for the impact side (clutch moments, influence, legacy, critics' or experts' rankings, peer quotes).
