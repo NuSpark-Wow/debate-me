@@ -1584,5 +1584,22 @@ if (window.parent !== window) {
 }
 })();
 </script>
+<script>
+/* ---------- keep the visitor on the tool when it gets shorter (only when embedded in a website page) ----------
+   When a screen change makes the tool shorter, the website page stays where it was, which can leave the
+   visitor looking at the footer. If the tool has scrolled out of sight after it shrinks, bring it back. */
+(function(){
+  if (window.parent === window || !window.IntersectionObserver || !window.ResizeObserver) return;
+  var root = document.querySelector(".wrap"); if (!root) return;
+  var seen = true, lastH = root.offsetHeight, waiting = 0;
+  new IntersectionObserver(function(es){ seen = es[es.length - 1].isIntersecting; }, { threshold: [0] }).observe(root);
+  new ResizeObserver(function(){
+    var h = root.offsetHeight, shrank = h < lastH - 120; lastH = h;
+    if (!shrank) return;
+    clearTimeout(waiting);
+    waiting = setTimeout(function(){ if (!seen) { try { window.parent.postMessage({ debateMeScroll:true }, "*"); } catch(e){} } }, 450);
+  }).observe(root);
+})();
+</script>
 </body>
 </html>
