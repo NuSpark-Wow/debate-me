@@ -212,6 +212,20 @@ a{color:var(--gold)}
 @media (max-width:700px){.chips{grid-template-columns:1fr 1fr}.chip.ownc{grid-column:1/-1;min-height:54px}.faces{grid-template-columns:repeat(2,1fr)}.personas{grid-template-columns:1fr 1fr}.sides{grid-template-columns:1fr}.vs{text-align:center}.own{flex-wrap:wrap}.own .go{width:100%}.scores{grid-template-columns:1fr}.rategrp{margin-left:0}}
 @media (max-width:420px){.personas{grid-template-columns:1fr}}
 
+/* swap a side / yes-no */
+.edits{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;margin-top:10px}
+.edits span{width:44px}
+.editbtn{background:transparent;border:1px dashed var(--line);color:var(--soft);border-radius:999px;padding:8px 12px;font-weight:700;font-size:14px;justify-self:center}
+.editbtn:hover{border-color:var(--gold);color:var(--gold)}
+.editrow{margin-top:12px;background:var(--bg2);border-radius:14px;padding:12px}
+.editrow label{display:block;font-weight:700;margin-bottom:8px;color:var(--soft)}
+.yesno{margin-top:14px;text-align:center}
+.ynlab{color:var(--soft);font-weight:700;font-size:14.5px;margin-bottom:8px}
+.ynlab b{color:var(--gold)}
+.ynrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.yn{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14.5px}
+.yn:hover{border-color:var(--gold)}
+@media (max-width:700px){.edits{grid-template-columns:1fr 1fr}.edits span{display:none}}
 /* type your own */
 .ownbox{margin-bottom:4px}
 /* watch mode */
@@ -292,6 +306,18 @@ a{color:var(--gold)}
         <div class="vs">VS</div>
         <button class="side B" id="sideB"></button>
       </div>
+      <div class="edits" id="edits">
+        <button class="editbtn" id="editA">✏️ Swap in someone else</button><span></span><button class="editbtn" id="editB">✏️ Swap in someone else</button>
+      </div>
+      <div class="editrow hide" id="editRow">
+        <label id="editLab"></label>
+        <div class="own"><input id="editIn" maxlength="80" autocomplete="off" placeholder="e.g. Brooks Robinson"><button class="go" id="editGo">Use it ▶</button></div>
+      </div>
+      <div class="yesno" id="yesno">
+        <div class="ynlab">Or make it a <b>Yes / No</b> debate:</div>
+        <div class="ynrow" id="ynRow"></div>
+      </div>
+      <div class="status" id="s2" style="text-align:center"></div>
       <button class="surprise" id="surprise">🎲 You pick for me</button>
       <div class="or">— OR —</div>
       <button class="watchbtn" id="watchBtn">🍿 Watch two debaters argue it out<small>Pick both debaters, sit back, and jump in as the moderator.</small></button>
@@ -507,7 +533,8 @@ async function frame(topic){
   topic = String(topic || "").trim();
   if (!topic) { $("topicIn").focus(); return; }
   blessVoice();
-  const s1 = $("s1"); s1.className = "status"; s1.textContent = "Setting up the debate…";
+  const s1 = $("step2").classList.contains("hide") ? $("s1") : $("s2"); $("s1").textContent = ""; $("s2").textContent = "";
+  s1.className = "status"; s1.textContent = "Setting up the debate…";
   $("topicGo").disabled = true;
   try {
     const f = await post("/api/debate", { part:"setup", topic, kid:S.kid }, 30000);
@@ -522,6 +549,7 @@ async function frame(topic){
     $("sideA").innerHTML = esc(f.sideA) + "<small>Side A</small>";
     $("sideB").innerHTML = esc(f.sideB) + "<small>Side B</small>";
     ["sideA","sideB","watchBtn"].forEach(id => $(id).classList.remove("picked"));
+    paintTweaks();
     $("step2").classList.remove("hide"); $("step3").classList.add("hide");
     $("step2").scrollIntoView({ behavior:"smooth", block:"start" });
     // Start the research now, while the player picks a side and the debaters.
@@ -535,6 +563,36 @@ async function frame(topic){
     s1.className = "status err"; s1.textContent = e.message || "That didn't go through. Please try again.";
   } finally { $("topicGo").disabled = false; }
 }
+
+// ---------- step 2: swap a side, or turn it into a yes/no debate ----------
+let editing = null;
+function isVersus(){ const f = S.frame; if (!f) return false; if (f.kind) return f.kind === "versus"; return !/^(yes|no)\b/i.test(f.sideA) && !/^(yes|no)\b/i.test(f.sideB); }
+function paintTweaks(){
+  const v = isVersus();
+  $("edits").classList.toggle("hide", !v); $("yesno").classList.toggle("hide", !v); $("editRow").classList.add("hide"); editing = null;
+  if (!v) return;
+  $("editA").textContent = "✏️ Swap " + S.frame.sideA + " for someone else";
+  $("editB").textContent = "✏️ Swap " + S.frame.sideB + " for someone else";
+  $("ynRow").innerHTML = [S.frame.sideA, S.frame.sideB].map(x => `<button class="yn" data-x="${esc(x)}">Is it ${esc(x)}? Yes or no</button>`).join("") + `<button class="yn" data-x="">✏️ Someone else…</button>`;
+}
+function openEdit(which){
+  editing = which;
+  $("editLab").textContent = which === "yn" ? "Who or what is your pick? We'll debate Yes or No on it." : `Replace ${which === "A" ? S.frame.sideA : S.frame.sideB} with:`;
+  $("editIn").value = ""; $("editIn").placeholder = which === "yn" ? "e.g. Brooks Robinson" : "e.g. Brooks Robinson";
+  $("editRow").classList.remove("hide"); $("editIn").focus();
+}
+function yesNoOn(x){ frame(`Claim: the answer to "${S.frame.question}" is ${x}`); }
+$("editA").onclick = () => openEdit("A");
+$("editB").onclick = () => openEdit("B");
+$("ynRow").onclick = e => { const b = e.target.closest(".yn"); if (!b) return; if (b.dataset.x) yesNoOn(b.dataset.x); else openEdit("yn"); };
+function useEdit(){
+  const v = $("editIn").value.trim(); if (!v || !editing) { $("editIn").focus(); return; }
+  if (editing === "yn") { yesNoOn(v); return; }
+  const A = editing === "A" ? v : S.frame.sideA, B = editing === "B" ? v : S.frame.sideB;
+  frame(`${A} vs ${B} (${S.frame.question})`);
+}
+$("editGo").onclick = useEdit;
+$("editIn").onkeydown = e => { if (e.key === "Enter") useEdit(); };
 
 // ---------- step 2 ----------
 function showStep3(){
