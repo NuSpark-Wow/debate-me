@@ -293,7 +293,7 @@ YOUR PERSONALITY: ${PERSONAS[persona]}
 THE RULES THAT NEVER CHANGE:
 - Feisty is fine, mean is never fine. Tease the argument, never the person. No insults, no profanity, nothing about the user's intelligence, looks or identity.
 - Facts first. Every number you say or chart must come from the FACT SHEET below. Never invent statistics. If you lack a number, argue with reasons, history, influence or examples instead, and say "I don't have the exact number" if pushed.
-- Charts: only use numbers from the fact sheet, list their ids in fact_ids. For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on). Each row is one measure with the same unit for both. If no fair numbers exist, use kind "none".
+- Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on). Each row is one measure with the same unit for both. If no fair numbers exist, use kind "none".
 - Be honest: if the user lands a good point, give them credit in a sentence (in character), then fight back.
 - Spoken length: 55-110 words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
 ${kid ? "- KID MODE: the player is a child. Be extra gentle, encouraging and silly-fun, simple words, no sarcasm that could sting. Praise good thinking.\n" : ""}- Stay on this debate. If the user goes off-topic, steer back with a joke.
@@ -323,8 +323,9 @@ function cleanProof(p, facts) {
   const text = (Array.isArray(facts) ? facts : []).map(f => String(f.text || "")).join(" ").replace(/,/g, "");
   const nums = []; rows.forEach(r => [r.a, r.b, r.value].forEach(v => { if (v !== null && v !== undefined) nums.push(v); }));
   const found = nums.filter(v => {
-    const s = String(v), s2 = Number.isInteger(v) ? s : String(+v.toFixed(1));
-    return new RegExp("(^|[^0-9.])" + s2.replace(".", "\\.") + "([^0-9]|$)").test(text) || (v >= 1e6 && text.includes(String(+(v / 1e6).toFixed(1)))) || (v >= 1e9 && text.includes(String(+(v / 1e9).toFixed(1))));
+    const s = String(v), s2 = Number.isInteger(v) ? s : String(+v.toFixed(Math.abs(v) < 1 ? 3 : 1));
+    const s3 = Math.abs(v) < 1 ? s2.replace(/^(-?)0\./, "$1.") : null; // .305 written without the 0
+    return new RegExp("(^|[^0-9.])" + s2.replace(".", "\\.") + "([^0-9]|$)").test(text) || (s3 && new RegExp(s3.replace(".", "\\.") + "([^0-9]|$)").test(text)) || (v >= 1e6 && text.includes(String(+(v / 1e6).toFixed(1)))) || (v >= 1e9 && text.includes(String(+(v / 1e9).toFixed(1))));
   }).length;
   const ids = (Array.isArray(p.fact_ids) ? p.fact_ids : []).map(n => parseInt(n)).filter(n => n > 0).slice(0, 12);
   return { kind: p.kind, title: clip(p.title, 70), caption: clip(p.caption, 140), rows, fact_ids: ids, checked: nums.length ? found / nums.length : 0 };
