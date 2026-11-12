@@ -172,6 +172,14 @@ a{color:var(--gold)}
 .send{flex:none;border:0;border-radius:14px;background:var(--gold);color:#2a1d00;font-weight:800;font-size:17px;padding:0 22px;box-shadow:0 4px 0 #b88a1c}
 .send:disabled,.mic:disabled{opacity:.5}
 .moves{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.helpme{margin-top:9px;font-size:13.5px;line-height:1.45;color:var(--soft);background:rgba(255,201,74,.08);border:1px dashed rgba(255,201,74,.35);border-radius:12px;padding:9px 12px}
+.helpme b{color:#ffc94a}
+.draft{margin-top:10px;border:2px solid rgba(255,201,74,.55);border-radius:14px;background:rgba(255,201,74,.07);padding:12px}
+.draft .dlab{font-weight:800;color:#ffc94a;font-size:14px;margin-bottom:8px}
+.draft .dtext{background:rgba(0,0,0,.25);border-radius:10px;padding:10px 12px;line-height:1.5;font-size:15px;white-space:pre-wrap;min-height:44px}
+.draft .dtext.wait{color:var(--soft);font-style:italic}
+.draft .dbtns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.draft .own{margin:0}
 .move{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:11px 15px;font-weight:800;font-size:14.5px}
 .move:hover{border-color:var(--gold)}
 .move:disabled{opacity:.45;cursor:default}
@@ -486,10 +494,23 @@ a{color:var(--gold)}
       <div class="lab"><span id="replyLab" style="color:var(--ink);font-weight:800;font-size:15px">Your turn</span> <span id="replyHint">Type or tap 🎤 and make your case.</span></div>
       <div class="rrow">
         <button class="mic" id="micBtn" title="Talk">🎤</button>
-        <textarea id="replyIn" maxlength="800" placeholder="Make your argument…"></textarea>
+        <textarea id="replyIn" maxlength="2000" placeholder="Make your argument…"></textarea>
         <button class="send" id="sendBtn">Send ➤</button>
       </div>
+      <div class="draft hide" id="draftBox">
+        <div class="dlab">🤝 Here's an argument for your side. Send it, change it, or ask for a new one.</div>
+        <div class="dtext" id="draftText"></div>
+        <div class="dbtns">
+          <button class="go" id="dOk">✅ Use it</button>
+          <button class="pill" id="dEdit">✏️ Edit it myself</button>
+          <button class="pill" id="dAgain">🔄 Try a different one</button>
+          <button class="pill" id="dX">✕ Close</button>
+        </div>
+        <div class="own"><input id="dChange" maxlength="200" placeholder="Ask for a change: shorter, funnier, add a stat…" autocomplete="off"><button class="go" id="dRev">Revise ▶</button></div>
+      </div>
+      <div class="helpme" id="helpMe">💡 <b>Need help with your side?</b> Tap <b>🤝 Help me argue</b>, or use Google or an AI tool to research proof and paste it here.</div>
       <div class="moves" id="playMoves">
+        <button class="move" id="mHelp">🤝 Help me argue</button>
         <button class="move" id="mProof">📊 Show me proof</button>
         <button class="move" id="mSource">🔎 Where's that from?</button>
         <button class="move" id="mUnfair">✋ That's not fair because…</button>
@@ -554,7 +575,7 @@ const FACES = {
 const PERSONAS = {
   professor:   { label:"🎓 The Professor", desc:"Calm, smart, all about the data", sample:"Hello, I'm {n}. I'll be taking the other side today, and I've brought the evidence. As you'll see, it's quite clear." },
   radio:       { label:"📻 The Sports-Radio Host", desc:"Loud, feisty, playful trash talk", sample:"Folks, it's {n} and we are LIVE! You really think you can win this one? Come ON! Bring your best shot!" },
-  drama:       { label:"🎭 The Drama Star", desc:"Emotional, theatrical, takes it personally", sample:"I'm {n}, darling, and I simply cannot believe you'd take that side. I'm wounded! Truly wounded! But fine. Let's do this." },
+  drama:       { label:"🎭 The Drama Star", desc:"Emotional, theatrical, takes it personally", sample:"I'm {n}, and I simply cannot believe you'd take that side. I'm wounded! Truly wounded! But fine. Let's do this." },
   lawyer:      { label:"⚖️ The Lawyer", desc:"Sharp logic, pokes holes", sample:"{n}, for the other side. Let the record show I came prepared. Every claim you make, I will cross-examine." },
   storyteller: { label:"👴 The Storyteller", desc:"Warm, folksy, argues with memories", sample:"Well hello there, I'm {n}. Pull up a chair. I remember the good old days, and I've got the facts to back them up." },
   smooth:      { label:"😎 The Smooth Talker", desc:"Witty, charming, quietly devastating", sample:"I'm {n}. Lovely to meet you. With all respect, my friend, you've picked the wrong side. But I'll be gentle. Mostly." }
@@ -1134,7 +1155,7 @@ function enterArena(){
   window.scrollTo({ top:0, behavior:"smooth" });
   const watch = S.mode === "watch";
   $("arena").classList.toggle("watch", watch);
-  $("playMoves").classList.toggle("hide", watch); $("watchMoves").classList.toggle("hide", !watch);
+  $("playMoves").classList.toggle("hide", watch); $("helpMe").classList.toggle("hide", watch); if (watch) closeDraft(); $("watchMoves").classList.toggle("hide", !watch);
   $("skipBtn").classList.toggle("hide", !watch);
   $("challengeProof").dataset.mode = S.mode;
   $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
@@ -1191,12 +1212,48 @@ async function doTurn(action, userText){
     return null;
   }
 }
+// ---------- help me argue: AI drafts the user's reply, the user approves or asks for changes ----------
+let draftBusy = false, draftNow = "";
+function closeDraft(){ $("draftBox").classList.add("hide"); draftNow = ""; $("dChange").value = ""; }
+function draftButtons(on){ ["dOk","dEdit","dAgain","dRev"].forEach(id => $(id).disabled = !on || (id !== "dAgain" && id !== "dRev" && !draftNow)); }
+async function getDraft(change){
+  if (draftBusy || !S.frame) return;
+  draftBusy = true;
+  $("draftBox").classList.remove("hide");
+  const t = $("draftText"); t.classList.add("wait");
+  t.textContent = change ? "Revising your argument…" : (draftNow ? "Writing a different one…" : "Writing an argument for your side…");
+  draftButtons(false);
+  if (!draftNow) $("draftBox").scrollIntoView({ behavior:"smooth", block:"nearest" });
+  try {
+    const r = await post("/api/debate", {
+      part:"assist", draft: draftNow, change: change || "",
+      title:S.frame.title, question:S.frame.question, sideA:S.frame.sideA, sideB:S.frame.sideB,
+      aiSide:S.aiSide, name:nameOf(), kid:S.kid, facts:S.facts, history:S.history,
+      kind:S.frame.kind, lists:rankLists()
+    });
+    draftNow = r.argument || "";
+    t.textContent = draftNow; t.classList.remove("wait");
+    $("dChange").value = "";
+  } catch (e) {
+    t.textContent = draftNow || "That didn't go through. Tap 🔄 to try again."; t.classList.remove("wait");
+  }
+  draftBusy = false; draftButtons(true);
+}
+$("mHelp").onclick = () => { if (S.busy) return; draftNow = ""; getDraft(""); };
+$("dAgain").onclick = () => getDraft("");
+$("dRev").onclick = () => { const c = $("dChange").value.trim(); if (!c) { $("dChange").focus(); return; } getDraft(c); };
+$("dChange").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("dRev").click(); } };
+$("dOk").onclick = () => { if (!draftNow || S.busy) return; const txt = draftNow; closeDraft(); userSays(txt); };
+$("dEdit").onclick = () => { if (!draftNow) return; const t = $("replyIn"); t.value = draftNow; closeDraft(); t.focus(); t.setSelectionRange(t.value.length, t.value.length); $("replyHint").textContent = "Change anything you like, then tap Send."; };
+$("dX").onclick = closeDraft;
+
 function userSays(text, action){
   text = String(text || "").trim();
   if (!text) return;
   blessVoice();
   if (S.mode === "watch") { askModerator(text); return; }
   if (S.busy) return;
+  closeDraft();
   S.history.push({ who:"user", text }); logEntry("user", "You", text);
   S.round++; paintRounds();
   $("replyIn").value = "";
