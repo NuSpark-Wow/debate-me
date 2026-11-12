@@ -464,11 +464,18 @@ $("surprise").onclick = () => pickSide(Math.random() < .5 ? "A" : "B");
 
 // ---------- step 3 ----------
 const missing = {};
-function faceSrc(f, ex){ return f + "-" + ex + ".png"; }
+// Picture names: young / female / oldman / black, then 1 talk, 2 smug, 3 outraged, 4 laugh, 5 plain
+const FILE = { young:"young", woman:"female", older:"oldman", smooth:"black" };
+const NUM = { talk:1, smug:2, outraged:3, laugh:4, calm:5 };
+const EXTS = ["png","jpg","jpeg","webp","PNG","JPG"];
+function faceSrc(f, ex, e){ return FILE[f] + NUM[ex] + "." + EXTS[e || 0]; }
+// If a picture isn't found as .png, try the other common types before giving up.
+function nextExt(img, f, ex){ const e = (parseInt(img.dataset.e) || 0) + 1; if (e >= EXTS.length) return false; img.dataset.e = e; img.src = faceSrc(f, ex, e); return true; }
+window.dmNextExt = nextExt;
 function paintFaces(){
   $("faces").innerHTML = Object.entries(FACES).map(([k, f]) =>
     `<button class="face${k === S.face ? " on" : ""}" data-f="${k}"><div class="pic" style="background:${f.color}">
-      <img src="${faceSrc(k,"calm")}" alt="${esc(f.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+      <img src="${faceSrc(k,"calm")}" alt="${esc(f.name)}" onerror="if(!window.dmNextExt(this,'${k}','calm')){this.style.display='none';this.nextElementSibling.style.display='grid'}">
       <div class="fallback" style="display:none">${f.emoji}</div></div>
       <div class="nm">${esc(f.name)}<small>${f.age}</small></div></button>`).join("");
   $("personas").innerHTML = Object.entries(PERSONAS).map(([k, p]) =>
@@ -494,7 +501,7 @@ function buildAvatar(){
   $("head").innerHTML = EXPRS.map(ex => `<img data-ex="${ex}" src="${faceSrc(S.face, ex)}" alt="">`).join("") +
     `<div class="fallback hide" id="fb">${f.emoji}<div class="mouth" id="fbMouth"></div></div>`;
   $("head").querySelectorAll("img").forEach(img => {
-    img.onerror = () => { missing[img.dataset.ex] = true; if (img.dataset.ex === "calm") $("fb").classList.remove("hide"); setExpr(curExpr); };
+    img.onerror = () => { if (nextExt(img, S.face, img.dataset.ex)) return; missing[img.dataset.ex] = true; if (img.dataset.ex === "calm") $("fb").classList.remove("hide"); setExpr(curExpr); };
   });
   $("who").innerHTML = `${esc(f.name)}<small>${esc(PERSONAS[S.persona].label.replace(/^\S+\s/, ""))}</small>`;
   setExpr("calm");
