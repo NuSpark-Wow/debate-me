@@ -83,6 +83,15 @@ a{color:var(--gold)}
 .persona.on{border-color:var(--gold);background:#3d2463}
 .persona b{display:block;font-size:16px;margin-bottom:3px}
 .persona span{color:var(--soft);font-size:13.5px;font-weight:600}
+.boxlab{font-size:13.5px;font-weight:700;color:var(--soft);margin:0 0 6px}
+.howrow{margin:4px 0 16px}
+.howlab{font-weight:800;font-size:17px;margin-bottom:8px}
+.howbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.how{text-align:left;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:14px 16px;font-weight:800;font-size:17px}
+.how small{display:block;font-weight:600;font-size:13.5px;color:var(--soft);margin-top:4px}
+.how.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
+@media(max-width:560px){.howbtns{grid-template-columns:1fr}}
+body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.written .rategrp,body.written #sampleBtn,body.written #tapplay{display:none !important}
 .startrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .sample{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:12px;padding:0 18px;height:56px;font-weight:700;font-size:15px}
 .big{flex:1;min-width:220px;font-size:20px}
@@ -367,10 +376,10 @@ a{color:var(--gold)}
       <p class="sub">Choose a classic debate, or type your own.</p>
       <div class="cats" id="cats"></div>
       <div class="chips" id="chips"></div>
-      <div class="own ownbox hide" id="ownRow">
-        <input id="topicIn" maxlength="200" placeholder="e.g. Beatles vs Stones" autocomplete="off">
+      <div class="ownbox hide" id="ownRow"><div class="boxlab">Type your topic, like "Beatles vs Stones."</div><div class="own">
+        <input id="topicIn" maxlength="200" autocomplete="off" aria-label="Your debate topic">
         <button class="go" id="topicGo">Let's go ▶</button>
-      </div>
+      </div></div>
       <div class="attachbox hide" id="attachRow">
         <div class="atlab">📎 Debate the attached: a list, article, post or screenshot</div>
         <div class="atbtns">
@@ -381,8 +390,8 @@ a{color:var(--gold)}
         <input type="file" id="atImg" accept="image/*" class="hide">
         <input type="file" id="atDoc" accept=".pdf,.txt,.md,.doc,.docx,application/pdf,text/plain" class="hide">
         <div class="atprev hide" id="atPreview"></div>
-        <textarea class="attext hide" id="atText" placeholder="Paste the post, article or list here…"></textarea>
-        <div class="own"><input id="atNote" maxlength="200" placeholder="Optional: what should we debate about it?" autocomplete="off"><button class="go" id="atGo">Debate this ▶</button></div>
+        <textarea class="attext hide" id="atText" aria-label="Paste the post, article or list here"></textarea>
+        <div class="boxlab">Optional: what should we debate about it?</div><div class="own"><input id="atNote" maxlength="200" autocomplete="off" aria-label="What should we debate about it (optional)"><button class="go" id="atGo">Debate this ▶</button></div>
       </div>
       <div class="status" id="s1"></div>
     </div>
@@ -401,7 +410,7 @@ a{color:var(--gold)}
       </div>
       <div class="editrow hide" id="editRow">
         <label id="editLab"></label>
-        <div class="own"><input id="editIn" maxlength="80" autocomplete="off" placeholder="e.g. Brooks Robinson"><button class="go" id="editGo">Use it ▶</button></div>
+        <div class="own"><input id="editIn" maxlength="80" autocomplete="off" aria-label="Your pick"><button class="go" id="editGo">Use it ▶</button></div>
       </div>
       <div class="yesno" id="yesno">
         <div class="ynlab">Or make it a <b>Yes / No</b> debate:</div>
@@ -420,7 +429,7 @@ a{color:var(--gold)}
       <div class="lists">
         <div class="lcol"><h3 id="rLeftTitle">The list</h3><ol id="rLeft"></ol></div>
         <div class="lcol mine"><h3>Your list <small>▲▼ move · ✕ remove</small></h3><ol id="rMine"></ol>
-          <div class="addrow"><input id="rAdd" maxlength="60" placeholder="➕ Add someone missing" autocomplete="off"><button class="pill" id="rAddGo">Add</button></div>
+          <div class="boxlab" style="margin-top:10px">➕ Add someone missing</div><div class="addrow"><input id="rAdd" maxlength="60" autocomplete="off" aria-label="Add someone missing"><button class="pill" id="rAddGo">Add</button></div>
         </div>
       </div>
       <div class="rbtns"><button class="go big" id="rPlay">🎤 Debate my list</button></div>
@@ -438,6 +447,13 @@ a{color:var(--gold)}
       <div id="pickTwo" class="pick2 hide">
         <div class="pcol A"><h3>Arguing for <span id="pcA"></span></h3><div class="faces sm" id="facesA"></div><div class="personas sm" id="personasA"></div></div>
         <div class="pcol B"><h3>Arguing for <span id="pcB"></span></h3><div class="faces sm" id="facesB"></div><div class="personas sm" id="personasB"></div></div>
+      </div>
+      <div class="howrow">
+        <div class="howlab">How do you want to debate?</div>
+        <div class="howbtns">
+          <button class="how" data-how="spoken" id="howSpoken">🔊 Spoken debate<small>Voices read every argument out loud.</small></button>
+          <button class="how" data-how="written" id="howWritten">📝 Written debate<small>Read and type at your own pace. No sound.</small></button>
+        </div>
       </div>
       <div class="startrow">
         <button class="sample" id="sampleBtn">▶ Hear a sample</button>
@@ -494,7 +510,7 @@ a{color:var(--gold)}
       <div class="lab"><span id="replyLab" style="color:var(--ink);font-weight:800;font-size:15px">Your turn</span> <span id="replyHint">Type or tap 🎤 and make your case.</span></div>
       <div class="rrow">
         <button class="mic" id="micBtn" title="Talk">🎤</button>
-        <textarea id="replyIn" maxlength="2000" placeholder="Make your argument…"></textarea>
+        <textarea id="replyIn" maxlength="2000" aria-label="Your argument"></textarea>
         <button class="send" id="sendBtn">Send ➤</button>
       </div>
       <div class="draft hide" id="draftBox">
@@ -506,7 +522,7 @@ a{color:var(--gold)}
           <button class="pill" id="dAgain">🔄 Try a different one</button>
           <button class="pill" id="dX">✕ Close</button>
         </div>
-        <div class="own"><input id="dChange" maxlength="200" placeholder="Ask for a change: shorter, funnier, add a stat…" autocomplete="off"><button class="go" id="dRev">Revise ▶</button></div>
+        <div class="boxlab" style="margin-top:10px">Ask for a change, like shorter, funnier, or add a stat.</div><div class="own"><input id="dChange" maxlength="200" autocomplete="off" aria-label="Ask for a change"><button class="go" id="dRev">Revise ▶</button></div>
       </div>
       <div class="helpme" id="helpMe">💡 <b>Need help with your side?</b> Tap <b>🤝 Help me argue</b>, or use Google or an AI tool to research proof and paste it here.</div>
       <div class="moves" id="playMoves">
@@ -858,7 +874,7 @@ function paintTweaks(){
 function openEdit(which){
   editing = which;
   $("editLab").textContent = which === "yn" ? "Who or what is your pick? We'll debate Yes or No on it." : `Replace ${which === "A" ? S.frame.sideA : S.frame.sideB} with:`;
-  $("editIn").value = ""; $("editIn").placeholder = which === "yn" ? "e.g. Brooks Robinson" : "e.g. Brooks Robinson";
+  $("editIn").value = "";
   $("editRow").classList.remove("hide"); $("editIn").focus();
 }
 function yesNoOn(x){ frame(`Claim: the answer to "${S.frame.question}" is ${x}`); }
@@ -1010,7 +1026,8 @@ function paintCtrls(){
   $("pauseBtn").disabled = !speaking || paused;
   $("contBtn").disabled = !speaking || !paused;
   $("replayBtn").disabled = !S.last || S.busy || (S.mode === "watch" && speaking);
-  $("skipBtn").disabled = !speaking;
+  $("skipBtn").disabled = written ? !endResolve : !speaking;
+  $("skipBtn").textContent = written ? "Next ▶" : "⏭ Next";
 }
 function wordsFromAlignment(al, text){
   if (!al || !al.characters) return text.split(/\s+/).filter(Boolean).map(w => ({ w, t:null }));
@@ -1029,7 +1046,22 @@ function paintCaption(list, speaker, side){
 function lightWord(i){
   $("caption").querySelectorAll(".w").forEach((s, j) => { s.classList.toggle("done", j < i); s.classList.toggle("on", j === i); });
 }
+// Spoken or written debate (chosen at setup, remembered for next time)
+let written = false;
+try { written = localStorage.getItem("dm_how") === "written"; } catch(e) {}
+function setHow(h, init){
+  written = h === "written";
+  try { localStorage.setItem("dm_how", h); } catch(e) {}
+  document.body.classList.toggle("written", written);
+  $("howSpoken").classList.toggle("on", !written); $("howWritten").classList.toggle("on", written);
+  $("startBtn").textContent = written ? "Let's debate! 📝" : "Let's debate! 🎤";
+  if (written && !init) stopVoice();
+}
+$("howSpoken").onclick = () => setHow("spoken");
+$("howWritten").onclick = () => setHow("written");
+setHow(written ? "written" : "spoken", true);
 async function getVoice(text, face, persona){
+  if (written) return null;   // no sound, and no voice costs
   try { return await post("/api/speak", { text, face, persona }, 30000); } catch(e){ return null; }
 }
 
@@ -1039,6 +1071,17 @@ function say(text, opt){
   return new Promise(async resolve => {
     stopVoice();
     const quiet = !!opt.quiet; // samples don't take over the stage
+    if (written) {
+      // Written debate: the whole argument shows at once, no sound
+      if (quiet) { resolve(null); return; }
+      if (opt.av) setActive(opt.av);
+      paintCaption(text.split(/\s+/).filter(Boolean).map(w => ({ w, t:null })), opt.speaker, opt.side);
+      const wav = active;
+      if (wav) { wav.set(opt.emotion && opt.emotion !== "calm" ? opt.emotion : "talk"); setTimeout(() => { if (wav.cur !== "calm") wav.set("calm"); }, 1400); }
+      try { $("log").open = true; } catch(e) {}
+      if (S.mode === "watch") { endResolve = () => resolve(null); paintCtrls(); return; }   // Next ▶ moves the debate along
+      resolve(null); return;
+    }
     const data = opt.cached || await getVoice(text, opt.face, opt.persona);
     const emotion = opt.emotion || "calm";
     if (!quiet) {
@@ -1160,7 +1203,7 @@ function enterArena(){
   $("challengeProof").dataset.mode = S.mode;
   $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
   $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case.";
-  $("replyIn").placeholder = watch ? "Ask a question or make a point…" : "Make your argument…";
+  $("replyIn").setAttribute("aria-label", watch ? "Ask a question or make a point" : "Your argument");
   $("sendBtn").textContent = watch ? "Ask ➤" : "Send ➤";
   const rk = isRank();
   document.querySelectorAll("#playMoves .rk").forEach(b => b.classList.toggle("hide", !rk));
