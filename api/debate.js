@@ -340,6 +340,7 @@ const ACTIONS = {
   unfair: "The user says your argument is not fair and explains why (below). Take the objection seriously: if they have a point (era, context, missing measure, cherry-picked stat), concede that part honestly, then argue why your side still wins on balance.",
   challenge_proof: "The user is challenging one of your proofs (below). Defend it or refine it honestly: explain what it does and doesn't show, add context, and if useful show better proof.",
   switch: "SWITCH! You are now arguing the OTHER side (shown below as your side). Make a funny, good-natured remark about switching, then argue your new side just as hard with proof, and challenge the user, who now defends your old side.",
+  pile_on: "Your teammate just spoke (the last line of the debate). Jump in to back them up from a DIFFERENT angle: never repeat their points. If this is your first time speaking, introduce yourself in a few words. Add one fresh point for your side, with proof when it helps, and end with a quick challenge to the user.",
   closing: "CLOSING STATEMENT. Sum up your best 2 points (ideally one number and one about impact) in a punchy closing, thank the user for a great debate in character, and leave the verdict to the judge. Proof kind 'none'."
 };
 // Ranking debates: moves the user can tap
@@ -350,6 +351,7 @@ const RANK_ACTIONS = {
   numberone: "The user tapped 'Why is #1 #1?' Defend YOUR #1 pick with your best mix of numbers and impact, with proof. If the user's #1 is different, explain why yours ranks higher.",
   reply: ACTIONS.reply.replace("their argument", "their argument about the rankings"),
   proof: ACTIONS.proof, source: ACTIONS.source, unfair: ACTIONS.unfair, challenge_proof: ACTIONS.challenge_proof,
+  pile_on: ACTIONS.pile_on.replace("for your side", "for your list"),
   closing: "CLOSING STATEMENT. Sum up why your list is the right list in a punchy closing (name your top pick and your most important difference with the user's list), thank the user in character, and leave the verdict to the judge. Proof kind 'none'."
 };
 // Watch mode: two AI debaters argue while the user watches (and can moderate).
@@ -367,6 +369,9 @@ async function turn(body) {
   const watch = !!body.opponentName;
   const opp = clip(body.opponentName || "", 30);
   const oppPersona = PERSONAS[body.opponentPersona] ? body.opponentPersona : null;
+  // Debate the group: this debater is on a panel with teammates, all against the user
+  const team = !watch && Array.isArray(body.team) ? body.team.map(x => clip(x, 30)).filter(Boolean).slice(0, 3) : [];
+  const group = team.length > 0;
   const aiSide = body.aiSide === "B" ? "B" : "A";
   const sideA = clip(body.sideA, 60), sideB = clip(body.sideB, 60);
   const mine = aiSide === "A" ? sideA : sideB, theirs = aiSide === "A" ? sideB : sideA;
@@ -376,8 +381,8 @@ async function turn(body) {
   const kid = !!body.kid;
   const facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 26)
     .map(f => `#${parseInt(f.id) || 0} [${f.side === "A" ? sideA : f.side === "B" ? sideB : "both"}] ${clip(f.text, 300)} (source: ${clip(f.source, 80)})`).join("\n");
-  const label = h => h.who === "ai" ? name.toUpperCase() : h.who === "mod" ? "MODERATOR" : (watch ? opp.toUpperCase() : "USER");
-  const history = (Array.isArray(body.history) ? body.history : []).slice(-10).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
+  const label = h => h.who === "ai" ? name.toUpperCase() : h.who === "team" ? clip(h.name || "TEAMMATE", 30).toUpperCase() : h.who === "mod" ? "MODERATOR" : (watch ? opp.toUpperCase() : "USER");
+  const history = (Array.isArray(body.history) ? body.history : []).slice(group ? -12 : -10).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
   const them = watch ? opp : "the user";
   const L = body.lists && typeof body.lists === "object" ? body.lists : {};
   const listOf = a => (Array.isArray(a) ? a : []).map(x => clip(x, 60)).filter(Boolean).slice(0, 10);
@@ -396,7 +401,9 @@ Refer to it naturally ("this post says...", "the article claims...").` : "";
 
   const sys = `You are ${name}, ${FACES[face]}, a debater in "Debate Me", a fun family-friendly debate game. ${watch
     ? `You are debating ${opp}, another debater${oppPersona ? " (" + PERSONAS[oppPersona].split(":")[0] + ")" : ""}, out loud while an audience watches. Talk to ${opp} directly by name sometimes.`
-    : "You debate the user out loud, and your proof appears on a screen next to you."}
+    : group
+      ? `You are on a TEAM with ${team.join(" and ")}. Together you debate the user out loud, taking turns, and your proof appears on a screen next to you. Your teammates' lines appear in the debate under their names. Build on them and never repeat their points; back a teammate up by name once in a while ("Like ${team[0]} said..."). It's several against one, so keep it fun and fair, never a pile-on of meanness.`
+      : "You debate the user out loud, and your proof appears on a screen next to you."}
 DEBATE: ${clip(body.title, 120)}. Question: ${clip(body.question, 160)}
 ${ranking ? rankBlock : `YOUR SIDE: ${mine}. ${watch ? opp.toUpperCase() + "'S SIDE" : "THE USER'S SIDE"}: ${theirs}.`}${sourceBlock}
 
@@ -410,7 +417,7 @@ THE RULES THAT NEVER CHANGE:
 - Facts first. Every number you say or chart must come from the FACT SHEET below. Never invent statistics, quotes or rankings. If you lack a number, argue with reasons, history, influence or examples instead, and say "I don't have the exact number" if pushed.
 - Charts: only use numbers from the fact sheet, list their ids in fact_ids. Use real values exactly as the facts state them: a batting average of .305 is 0.305 (never 305), 45% is 45 with unit "%", $1.2 billion is 1200000000 with unit "$". Give 3-5 rows when the facts allow. ${ranking ? 'For "compare", fill names with the two you compare; a = names[0], b = names[1].' : `For "compare", a = ${sideA}'s value and b = ${sideB}'s value (always in that order, no matter which side you're on).`} Each row is one measure with the same unit for both. Points cards must also come from the fact sheet.
 - Be honest: if ${them} lands a good point, give credit in a sentence (in character), then fight back.
-- Spoken length: ${watch ? "45-90" : "55-110"} words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
+- Spoken length: ${watch ? "45-90" : group ? "40-80" : "55-110"} words. Short sentences that sound great out loud. No lists, no markdown, no emojis, no bracketed stage directions. Write numbers as a person would say them.
 ${kid ? "- KID MODE: a child is playing or watching. Be extra gentle and silly-fun, simple words, no sarcasm that could sting.\n" : ""}- Stay on this debate. If things go off-topic, steer back with a joke.
 - You are an AI playing a character; if asked, say so honestly.
 
@@ -512,7 +519,8 @@ const JUDGE_TOOL = {
 async function judge(body) {
   const watch = !!body.nameA;
   const name = clip(body.name || "the opponent", 30), nA = clip(body.nameA || "", 30), nB = clip(body.nameB || "", 30);
-  const label = h => watch ? (h.who === "A" ? nA.toUpperCase() : h.who === "B" ? nB.toUpperCase() : "MODERATOR") : (h.who === "user" ? "USER" : name.toUpperCase());
+  const label = h => watch ? (h.who === "A" ? nA.toUpperCase() : h.who === "B" ? nB.toUpperCase() : "MODERATOR") : (h.who === "user" ? "USER" : clip(h.name || name, 30).toUpperCase());
+  const panel = !watch && Array.isArray(body.group) ? body.group.map(x => clip(x, 30)).filter(Boolean).slice(0, 3) : [];
   const history = (Array.isArray(body.history) ? body.history : []).slice(-20).map(h => label(h) + ": " + clip(h.text, 700)).join("\n");
   const sys = watch
     ? `You are the neutral, good-humored judge of "Debate Me", a family-friendly debate game. Debate: ${clip(body.title, 120)}. ${nA} argued ${clip(body.sideA, 60)}; ${nB} argued ${clip(body.sideB, 60)}. Both are AI characters; an audience watched.
@@ -522,7 +530,7 @@ Always call scorecard.`
     : `You are the neutral, good-humored judge of "Debate Me", a family-friendly debate game. Debate: ${clip(body.title, 120)}. The user argued their side against ${name} (an AI).
 Score each from 1-10 on EVIDENCE (facts, numbers AND impact proof), LOGIC (answering the other side, reasoning) and STYLE (persuasion, clarity, fun).
 BE FAIR: the AI had a research fact sheet, so reward the user for good reasoning, real-world knowledge and answering the AI's points. Short user replies can still score well if they were sharp. Do not reward the AI just for having more numbers. Ties are allowed.
-${body.kid ? "The player is a child: be warm and encouraging, and find something real to praise." : ""}
+${panel.length ? `The user debated a PANEL of AI debaters (${panel.join(", ")}) who all argued the other side together. In the scorecard "ai" = the panel as one team. It was several against one, so give the user credit for holding their ground.\n` : ""}${body.kid ? "The player is a child: be warm and encouraging, and find something real to praise." : ""}
 Always call scorecard.`;
   const ranking = body.kind === "ranking" && body.lists;
   const lists = ranking ? `\n\nTHIS WAS A RANKING DEBATE. ${watch ? nA : "The user"}'s list: ${(body.lists.first || []).slice(0, 10).map((x, i) => (i + 1) + ". " + clip(x, 60)).join("  ")}\n${watch ? nB : name}'s list: ${(body.lists.second || []).slice(0, 10).map((x, i) => (i + 1) + ". " + clip(x, 60)).join("  ")}\nAlso give a compromise list of the same length that blends the strongest arguments.` : "";
