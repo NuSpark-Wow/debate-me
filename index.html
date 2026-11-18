@@ -42,7 +42,7 @@ a{color:var(--gold)}
 .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .cat{flex:none;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14.5px}
 .cat.on{background:var(--gold);color:#2a1d00;border-color:var(--gold)}
-.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 .chip small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--a);margin-bottom:4px}
 .chip.q small{color:var(--b)}
 .chip.ownc{min-height:54px}
@@ -289,7 +289,14 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
 .complist ol{margin:0;padding-left:22px;line-height:1.6;font-weight:700}
 @media (max-width:700px){.lists{grid-template-columns:1fr}.lv{grid-template-columns:1fr}}
 /* type your own */
-.ownbox{margin-bottom:4px}
+.ownbox{margin-bottom:10px}
+.atbtn{display:block;width:100%;border:2px dashed var(--a);background:transparent;color:#b9dcff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;text-align:center;margin-bottom:6px}
+.atbtn.on{background:rgba(78,168,255,.12)}
+#s1:empty{min-height:0;margin:0}
+.ideas{border-top:1px solid var(--line);margin-top:14px;padding-top:16px}
+.ideaslab{font-weight:800;font-size:16px;margin:0 0 10px;color:var(--ink)}
+.more{display:block;margin:2px auto 0;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:10px 20px;font-weight:800;font-size:15px}
+.more:hover{background:rgba(255,201,74,.12)}
 /* watch mode */
 .watchbtn{display:block;width:100%;margin:16px 0 0;border:2px solid var(--line);background:linear-gradient(135deg,#3b1f66,#2a1747);color:var(--ink);border-radius:16px;padding:16px;font-weight:800;font-size:18px}
 .watchbtn small{display:block;color:var(--soft);font-weight:600;font-size:13.5px;margin-top:4px}
@@ -311,6 +318,17 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
 .avwrap{position:relative}
 .avs{display:grid;grid-template-columns:1fr;gap:10px}
 .avs.duo{grid-template-columns:1fr 1fr}
+.avs.grp{grid-template-columns:repeat(var(--n,3),minmax(0,1fr));padding:4px}
+.avs.grp .avatar{opacity:.5;transform:scale(.96);transition:opacity .25s,transform .25s,box-shadow .25s}
+.avs.grp .avatar.live{opacity:1;transform:none;box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,201,74,.35)}
+.avs.grp .avatar .fallback{font-size:64px}
+.avs.grp .plate{left:6px;right:6px;bottom:6px}
+.avs.grp .plate .who{font-size:13px;padding:5px 8px}
+.whorow{margin:0 0 16px}
+.panelrows{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:-4px 0 16px}
+.prow2{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.prow2 .pnm{flex:none;min-width:70px;font-weight:800;border-left:5px solid var(--c);padding-left:8px}
+.prow2 select{flex:1;min-width:0;width:100%;max-width:100%;text-overflow:ellipsis;height:44px;border:2px solid var(--line);border-radius:10px;background:#170a2a;color:var(--ink);font:inherit;font-weight:700;font-size:15px;padding:0 8px}
 .avs.duo .avatar{opacity:.5;transform:scale(.96);transition:opacity .25s,transform .25s,box-shadow .25s}
 .avs.duo .avatar.live{opacity:1;transform:none;box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,201,74,.35)}
 .avs.duo .avatar .fallback{font-size:80px}
@@ -347,7 +365,7 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
 @keyframes dmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (prefers-reduced-motion:reduce){.stage .pic{animation:none}}
 @media (max-width:560px){.stage .line{gap:5px;margin:0 22px}.stage:before,.stage:after{width:16px}.stage .nm{font-size:12px}.stage .tag{font-size:11.5px;margin:0 20px 6px}.stage .pic .fb{font-size:28px}}
-@media (max-width:560px){.rrow{flex-wrap:wrap}.rrow textarea{flex-basis:100%;order:-1}.mic{height:54px}.send{flex:1;height:54px}.avs.duo .plate{left:6px;right:6px;bottom:6px}.avs.duo .plate .who{font-size:12.5px;padding:4px 8px}.avs.duo .plate .who small{display:none}}
+@media (max-width:560px){.rrow{flex-wrap:wrap}.rrow textarea{flex-basis:100%;order:-1}.mic{height:54px}.send{flex:1;height:54px}.avs.duo .plate{left:6px;right:6px;bottom:6px}.avs.duo .plate .who{font-size:12.5px;padding:4px 8px}.avs.duo .plate .who small{display:none}.avs.grp .plate .who{font-size:11.5px;padding:3px 6px}.avs.grp .plate .who small{display:none}}
 @media (max-width:700px){.pick2{grid-template-columns:1fr}.pts{grid-template-columns:1fr}.arena.watch{grid-template-columns:1fr}.avs.duo .avatar .fallback{font-size:56px}}
 </style>
 </head>
@@ -373,13 +391,12 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
     </div>
     <div class="step" id="step1">
       <h2><b>1</b>Pick a fight</h2>
-      <p class="sub">Choose a classic debate, or type your own.</p>
-      <div class="cats" id="cats"></div>
-      <div class="chips" id="chips"></div>
-      <div class="ownbox hide" id="ownRow"><div class="boxlab">Type your topic, like "Beatles vs Stones."</div><div class="own">
+      <p class="sub">Type your own topic, or pick one of ours.</p>
+      <div class="ownbox" id="ownRow"><div class="boxlab">✏️ Type your own topic, like "Beatles vs Stones."</div><div class="own">
         <input id="topicIn" maxlength="200" autocomplete="off" aria-label="Your debate topic">
         <button class="go" id="topicGo">Let's go ▶</button>
       </div></div>
+      <button class="atbtn" id="atChip">📎 Or debate something you attach: a list, article, post or screenshot</button>
       <div class="attachbox hide" id="attachRow">
         <div class="atlab">📎 Debate the attached: a list, article, post or screenshot</div>
         <div class="atbtns">
@@ -394,6 +411,12 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
         <div class="boxlab">Optional: what should we debate about it?</div><div class="own"><input id="atNote" maxlength="200" autocomplete="off" aria-label="What should we debate about it (optional)"><button class="go" id="atGo">Debate this ▶</button></div>
       </div>
       <div class="status" id="s1"></div>
+      <div class="ideas">
+        <div class="ideaslab">💡 Or try one of these</div>
+        <div class="cats" id="cats"></div>
+        <div class="chips" id="chips"></div>
+        <button class="more" id="moreIdeas">🔀 More ideas</button>
+      </div>
     </div>
 
     <div class="step hide" id="step2">
@@ -440,6 +463,18 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
     <div class="step hide" id="step3">
       <h2 id="s3title"><b>3</b>Pick your opponent</h2>
       <p class="sub" id="s3sub">Choose a face, then a personality. Same facts, different attitude.</p>
+      <div class="whorow" id="whoRow">
+        <div class="howlab">Who do you want to debate?</div>
+        <div class="howbtns">
+          <button class="how" id="whoOne">🎤 Debate one<small>You vs one debater.</small></button>
+          <button class="how" id="whoGroup">👥 Debate the group<small>You vs a panel of 2 or 3 debaters, all on the other side.</small></button>
+        </div>
+      </div>
+      <div id="pickGroup" class="hide">
+        <div class="boxlab">Tap 2 or 3 debaters for your panel, then give each one a personality.</div>
+        <div class="faces" id="facesG"></div>
+        <div class="panelrows" id="panelRows"></div>
+      </div>
       <div id="pickOne">
         <div class="faces" id="faces"></div>
         <div class="personas" id="personas"></div>
@@ -565,22 +600,22 @@ const store = { get(k, d){ try { const v = localStorage.getItem(k); return v == 
 
 // ---------- data ----------
 const CATS = [
-  { id:"sports", label:"⚾ Sports", vs:["Michael Jordan vs LeBron James","Babe Ruth vs Willie Mays","Tom Brady vs Joe Montana","Yankees vs Red Sox"],
-    q:["Who's the best 3rd baseman of all time?","Should Pete Rose be in the Hall of Fame?","Is the designated hitter good for baseball?","Are today's athletes better than the legends?"], rank:["Top 10 third basemen of all time","Top 5 NBA players ever"] },
-  { id:"music", label:"🎵 Music", vs:["Prince vs Michael Jackson","The Beatles vs The Rolling Stones","Elvis vs Frank Sinatra","Vinyl vs streaming"],
-    q:["Who is the greatest singer of all time?","Were the '80s the best decade for music?","Do the Grammys still matter?","Is today's music as good as the classics?"], rank:["Top 10 rock bands of all time","Top 5 Motown singers"] },
-  { id:"movies", label:"🎬 Movies & TV", vs:["Star Trek vs Star Wars","Friends vs Seinfeld","Al Pacino vs Robert De Niro","The Godfather vs The Godfather Part II"],
-    q:["What's the greatest movie of all time?","Is a remake ever better than the original?","Is streaming better than going to the movies?","Was TV better in the '90s?"], rank:["Top 10 movies of all time","Top 5 sitcoms ever"] },
-  { id:"history", label:"🏛️ History", vs:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson"],
-    q:["What was the greatest invention ever?","Who was the most important Founding Father?","Was the moon landing America's greatest achievement?","Which century changed the world the most?"], rank:["Top 5 U.S. presidents","Top 10 inventions that changed the world"] },
-  { id:"food", label:"🍔 Food & Health", vs:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Butter vs margarine"],
-    q:["Is breakfast the most important meal?","Does pineapple belong on pizza?","Is a little chocolate good for you?","Is organic food worth the price?"], rank:["Top 5 pizza toppings","Top 10 healthiest foods"] },
-  { id:"home", label:"🏠 Home & Life", vs:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets"],
-    q:["Is working from home better than the office?","Should you make your bed every day?","Is it okay to recline your airplane seat?","Are smartphones making life better?"], rank:["Top 5 dog breeds for families","Top 5 home upgrades worth the money"] },
-  { id:"toys", label:"🧸 Toys & Pop Culture", vs:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation"],
-    q:["What's the greatest toy of all time?","Are video games good for kids?","Were Saturday-morning cartoons the best TV ever?","Are superhero movies getting old?"], rank:["Top 10 toys of all time","Top 5 video game consoles"] },
-  { id:"other", label:"✨ Other", vs:["Picasso vs Van Gogh","Books vs movies","Morning person vs night owl","Beach vacation vs mountain vacation"],
-    q:["Is a hot dog a sandwich?","Is photography real art?","Is cursive still worth learning?","Should daylight saving time end?"], rank:["Top 10 painters of all time","Top 5 U.S. vacation spots"] }
+  { id:"sports", label:"⚾ Sports", vs:["Michael Jordan vs LeBron James","Babe Ruth vs Willie Mays","Tom Brady vs Joe Montana","Yankees vs Red Sox", "Mike Schmidt vs George Brett", "Muhammad Ali vs Mike Tyson"],
+    q:["Who's the best 3rd baseman of all time?","Should Pete Rose be in the Hall of Fame?","Is the designated hitter good for baseball?","Are today's athletes better than the legends?", "Should college athletes be paid?", "Is golf a real sport?"], rank:["Top 10 third basemen of all time","Top 5 NBA players ever", "Top 5 Olympic athletes ever", "Top 10 sports moments of all time"] },
+  { id:"music", label:"🎵 Music", vs:["Prince vs Michael Jackson","The Beatles vs The Rolling Stones","Elvis vs Frank Sinatra","Vinyl vs streaming", "Whitney Houston vs Mariah Carey", "Bruce Springsteen vs Billy Joel"],
+    q:["Who is the greatest singer of all time?","Were the '80s the best decade for music?","Do the Grammys still matter?","Is today's music as good as the classics?", "Is live music better than the studio version?", "Was MTV good for music?"], rank:["Top 10 rock bands of all time","Top 5 Motown singers", "Top 10 albums of all time", "Top 5 guitarists ever"] },
+  { id:"movies", label:"🎬 Movies & TV", vs:["Star Trek vs Star Wars","Friends vs Seinfeld","Al Pacino vs Robert De Niro","The Godfather vs The Godfather Part II", "Jaws vs Jurassic Park", "I Love Lucy vs The Honeymooners"],
+    q:["What's the greatest movie of all time?","Is a remake ever better than the original?","Is streaming better than going to the movies?","Was TV better in the '90s?", "Is Die Hard a Christmas movie?", "Should movies be shorter?"], rank:["Top 10 movies of all time","Top 5 sitcoms ever", "Top 5 movie villains", "Top 10 TV dramas ever"] },
+  { id:"history", label:"🏛️ History", vs:["George Washington vs Abraham Lincoln","Thomas Edison vs Nikola Tesla","Ancient Rome vs Ancient Greece","Ben Franklin vs Thomas Jefferson", "The Wright brothers vs Henry Ford", "Amelia Earhart vs Charles Lindbergh"],
+    q:["What was the greatest invention ever?","Who was the most important Founding Father?","Was the moon landing America's greatest achievement?","Which century changed the world the most?", "Was the printing press more important than the internet?", "Would you rather live 100 years ago or 100 years from now?"], rank:["Top 5 U.S. presidents","Top 10 inventions that changed the world", "Top 5 explorers in history", "Top 10 American landmarks"] },
+  { id:"food", label:"🍔 Food & Health", vs:["Processed food vs fast food","Coffee vs tea","New York pizza vs Chicago pizza","Butter vs margarine", "McDonald's vs Burger King", "Ice cream vs frozen yogurt"],
+    q:["Is breakfast the most important meal?","Does pineapple belong on pizza?","Is a little chocolate good for you?","Is organic food worth the price?", "Is cereal a soup?", "Are eggs good for you?"], rank:["Top 5 pizza toppings","Top 10 healthiest foods", "Top 5 fast-food burgers", "Top 10 desserts of all time"] },
+  { id:"home", label:"🏠 Home & Life", vs:["Carpet vs hardwood floors","City life vs suburbs","Gas stove vs electric stove","Cats vs dogs as pets", "Renting vs buying a home", "Real Christmas tree vs fake tree"],
+    q:["Is working from home better than the office?","Should you make your bed every day?","Is it okay to recline your airplane seat?","Are smartphones making life better?", "Should kids get an allowance?", "Is a dishwasher better than washing by hand?"], rank:["Top 5 dog breeds for families","Top 5 home upgrades worth the money", "Top 5 household inventions", "Top 5 U.S. cities to live in"] },
+  { id:"toys", label:"🧸 Toys & Pop Culture", vs:["Barbie vs American Girl dolls","Marvel vs DC","LEGO vs Lincoln Logs","Nintendo vs PlayStation", "Mario vs Sonic", "Hot Wheels vs Matchbox"],
+    q:["What's the greatest toy of all time?","Are video games good for kids?","Were Saturday-morning cartoons the best TV ever?","Are superhero movies getting old?", "Is Monopoly the best board game?", "Are trading cards worth collecting?"], rank:["Top 10 toys of all time","Top 5 video game consoles", "Top 5 board games ever", "Top 10 cartoon characters"] },
+  { id:"other", label:"✨ Other", vs:["Picasso vs Van Gogh","Books vs movies","Morning person vs night owl","Beach vacation vs mountain vacation", "Summer vs winter", "Texting vs calling"],
+    q:["Is a hot dog a sandwich?","Is photography real art?","Is cursive still worth learning?","Should daylight saving time end?", "Is it rude to be five minutes late?", "Will robots ever replace teachers?"], rank:["Top 10 painters of all time","Top 5 U.S. vacation spots", "Top 5 wonders of the world", "Top 5 dream jobs"] }
 ];
 const FACES = {
   young:  { name:"Jake",   age:"30s", emoji:"🧢", color:"#2bb3b1" },
@@ -600,7 +635,7 @@ const EXPRS = ["calm","talk","smug","outraged","laugh"];
 const THINK = {
   open:"{n} is reading the research…", rebut_open:"{n} is sizing up the opening…", reply:"{n} is cooking up a comeback…", proof:"{n} is pulling the receipts…",
   source:"{n} is checking the sources…", unfair:"{n} is thinking that over…", challenge_proof:"{n} is defending the proof…",
-  switch:"{n} is switching sides…", closing:"{n} is preparing a closing statement…", moderator:"{n} is answering the moderator…"
+  switch:"{n} is switching sides…", pile_on:"{n} is jumping in…", closing:"{n} is preparing a closing statement…", moderator:"{n} is answering the moderator…"
 };
 // Picture names: young / female / oldman / black, then 1 talk, 2 smug, 3 outraged, 4 laugh, 5 plain
 const FILE = { young:"young", woman:"female", older:"oldman", smooth:"black" };
@@ -647,8 +682,17 @@ const S = {
   busy:false, pending:null, last:null, wtoken:0, plan:[], wi:0, modQ:null
 };
 if (!FACES[S.face]) S.face = "smooth";
+// Debate the group: you vs a panel of 2-3 debaters on the other side
+let savedPanel = null; try { savedPanel = JSON.parse(store.get("dm_panel", "null")); } catch(e){}
+S.group = store.get("dm_group", "0") === "1";
+S.panel = (Array.isArray(savedPanel) && savedPanel.length >= 2 && savedPanel.length <= 3 && savedPanel.every(p => p && FACES[p.face] && PERSONAS[p.persona]))
+  ? savedPanel : [{ face:"young", persona:"radio" }, { face:"woman", persona:"professor" }, { face:"older", persona:"storyteller" }];
+S.gi = 0; S.speakName = null;
+const isGroup = () => S.group && S.mode !== "watch";
+const teamNames = () => S.panel.map(p => FACES[p.face].name);
+const teamName = () => { const n = teamNames(); return n.length < 3 ? n.join(" & ") : n.slice(0, -1).join(", ") + " & " + n[n.length - 1]; };
 if (!PERSONAS[S.persona]) S.persona = "smooth";
-const nameOf = () => FACES[S.face].name;
+const nameOf = () => isGroup() ? teamName() : FACES[S.face].name;
 const debName = k => FACES[S.deb[k].face].name;
 const sideName = k => k === "A" ? S.frame.sideA : S.frame.sideB;
 const other = k => k === "A" ? "B" : "A";
@@ -673,23 +717,23 @@ paintKid();
 $("newTopic").onclick = () => { stopAll(); location.replace(location.pathname); };
 
 // ---------- step 1 ----------
-let catOn = "sports";
+let catOn = "sports", ideaPage = 0;
+// Two of each kind at a time; 🔀 More ideas shows the next set.
+const pick2 = (arr, pg) => { if (!arr || !arr.length) return []; const n = arr.length, st = (pg * 2) % n; return [arr[st], arr[(st + 1) % n]].filter((x, i, a) => a.indexOf(x) === i); };
 function paintCats(){
   $("cats").innerHTML = CATS.map(c => `<button class="cat${c.id === catOn ? " on" : ""}" data-c="${c.id}">${c.label}</button>`).join("");
   const cat = CATS.find(c => c.id === catOn);
-  const ownOn = !$("ownRow").classList.contains("hide");
-  $("chips").innerHTML = cat.vs.map(t => `<button class="chip"><small>⚔️ Head to head</small>${esc(t)}</button>`).join("")
-    + cat.q.map(t => `<button class="chip q"><small>❓ Big question</small>${esc(t)}</button>`).join("")
-    + (cat.rank || []).map(t => `<button class="chip rk"><small>🏆 Top list</small>${esc(t)}</button>`).join("")
-    + `<button class="chip ownc${ownOn ? " on" : ""}" id="ownChip">✏️ Type your own topic</button>`
-    + `<button class="chip atc${$("attachRow").classList.contains("hide") ? "" : " on"}" id="atChip">📎 Debate the attached</button>`;
+  $("chips").innerHTML = pick2(cat.vs, ideaPage).map(t => `<button class="chip"><small>⚔️ Head to head</small>${esc(t)}</button>`).join("")
+    + pick2(cat.q, ideaPage).map(t => `<button class="chip q"><small>❓ Big question</small>${esc(t)}</button>`).join("")
+    + pick2(cat.rank, ideaPage).map(t => `<button class="chip rk"><small>🏆 Top list</small>${esc(t)}</button>`).join("");
 }
-$("cats").onclick = e => { const b = e.target.closest(".cat"); if (!b) return; catOn = b.dataset.c; paintCats(); };
-$("chips").onclick = e => {
-  const b = e.target.closest(".chip"); if (!b) return;
-  if (b.id === "ownChip") { $("ownRow").classList.remove("hide"); $("attachRow").classList.add("hide"); paintCats(); $("topicIn").focus(); return; }
-  if (b.id === "atChip") { $("attachRow").classList.remove("hide"); $("ownRow").classList.add("hide"); paintCats(); $("attachRow").scrollIntoView({ behavior:"smooth", block:"center" }); return; }
-  frame(b.lastChild.textContent);
+$("cats").onclick = e => { const b = e.target.closest(".cat"); if (!b) return; catOn = b.dataset.c; ideaPage = 0; paintCats(); };
+$("moreIdeas").onclick = () => { ideaPage++; paintCats(); };
+$("chips").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; frame(b.lastChild.textContent); };
+$("atChip").onclick = () => {
+  const open = $("attachRow").classList.toggle("hide") === false;
+  $("atChip").classList.toggle("on", open);
+  if (open) $("attachRow").scrollIntoView({ behavior:"smooth", block:"center" });
 };
 $("topicGo").onclick = () => frame($("topicIn").value);
 $("topicIn").onkeydown = e => { if (e.key === "Enter") frame($("topicIn").value); };
@@ -756,6 +800,7 @@ async function frame(topic, att){
   blessVoice();
   const s1 = $("step2").classList.contains("hide") ? $("s1") : $("s2"); $("s1").textContent = ""; $("s2").textContent = "";
   s1.className = "status"; s1.textContent = att ? "Reading what you attached…" : "Setting up the debate…";
+  if (s1.id === "s1") s1.scrollIntoView({ behavior:"smooth", block:"center" });
   $("topicGo").disabled = true; $("atGo").disabled = true;
   try {
     const f = await post("/api/debate", { part:"setup", topic, kid:S.kid, attach: att ? { type:att.type, data:att.data, text:att.text, media_type:att.media_type } : undefined }, 60000);
@@ -891,17 +936,21 @@ $("editGo").onclick = useEdit;
 $("editIn").onkeydown = e => { if (e.key === "Enter") useEdit(); };
 
 // ---------- step 2 ----------
-function showStep3(){
+function showStep3(stay){
   const watch = S.mode === "watch";
   $("s3title").innerHTML = watch ? "<b>3</b>Pick the debaters" : "<b>3</b>Pick your opponent";
   $("s3sub").textContent = watch ? "Choose a face and a personality for each side." : "Choose a face, then a personality. Same facts, different attitude.";
-  $("pickOne").classList.toggle("hide", watch); $("pickTwo").classList.toggle("hide", !watch);
+  const grp = !watch && S.group;
+  if (grp) { $("s3title").innerHTML = "<b>3</b>Pick your panel"; $("s3sub").textContent = "They all argue the other side, and they take turns coming at you."; }
+  $("whoRow").classList.toggle("hide", watch);
+  $("whoOne").classList.toggle("on", !S.group); $("whoGroup").classList.toggle("on", S.group);
+  $("pickOne").classList.toggle("hide", watch || grp); $("pickGroup").classList.toggle("hide", !grp); $("pickTwo").classList.toggle("hide", !watch);
   $("startBtn").textContent = watch ? "Start the debate 🍿" : "Let's debate! 🎤";
   $("sampleBtn").textContent = watch ? "▶ Hear them" : "▶ Hear a sample";
   $("pcA").textContent = S.frame.sideA; $("pcB").textContent = S.frame.sideB;
   paintPickers();
   $("step3").classList.remove("hide");
-  $("step3").scrollIntoView({ behavior:"smooth", block:"start" });
+  if (!stay) $("step3").scrollIntoView({ behavior:"smooth", block:"start" });
 }
 function pickSide(k){
   S.mode = "play"; S.userSide = k; S.aiSide = other(k);
@@ -916,7 +965,7 @@ $("watchBtn").onclick = () => { S.mode = "watch"; $("sideA").classList.remove("p
 // ---------- step 3 ----------
 function facesHTML(sel){
   return Object.entries(FACES).map(([k, f]) =>
-    `<button class="face${k === sel ? " on" : ""}" data-f="${k}"><div class="pic" style="background:${f.color}">
+    `<button class="face${(Array.isArray(sel) ? sel.includes(k) : k === sel) ? " on" : ""}" data-f="${k}"><div class="pic" style="background:${f.color}">
       <img src="${faceSrc(k,"calm")}" alt="${esc(f.name)}" onerror="if(!window.dmNextExt(this,'${k}','calm')){this.style.display='none';this.nextElementSibling.style.display='grid'}">
       <div class="fallback" style="display:none">${f.emoji}</div></div>
       <div class="nm">${esc(f.name)}<small>${f.age}</small></div></button>`).join("");
@@ -927,7 +976,25 @@ function personasHTML(sel){
 function paintPickers(){
   $("faces").innerHTML = facesHTML(S.face); $("personas").innerHTML = personasHTML(S.persona);
   ["A","B"].forEach(k => { $("faces" + k).innerHTML = facesHTML(S.deb[k].face); $("personas" + k).innerHTML = personasHTML(S.deb[k].persona); });
+  $("facesG").innerHTML = facesHTML(S.panel.map(p => p.face));
+  $("panelRows").innerHTML = S.panel.map((p, i) => `<div class="prow2"><span class="pnm" style="--c:${FACES[p.face].color}">${esc(FACES[p.face].name)}</span><select data-i="${i}" aria-label="${esc(FACES[p.face].name)}'s personality">${Object.entries(PERSONAS).map(([k, x]) => `<option value="${k}"${k === p.persona ? " selected" : ""}>${esc(x.label)}: ${esc(x.desc)}</option>`).join("")}</select></div>`).join("");
 }
+function savePanel(){ store.set("dm_panel", JSON.stringify(S.panel)); paintPickers(); }
+function setGroup(on){ S.group = on; store.set("dm_group", on ? "1" : "0"); showStep3(true); }
+$("whoOne").onclick = () => setGroup(false);
+$("whoGroup").onclick = () => setGroup(true);
+$("facesG").onclick = e => {
+  const b = e.target.closest(".face"); if (!b) return;
+  const f = b.dataset.f, i = S.panel.findIndex(p => p.face === f);
+  if (i >= 0) { if (S.panel.length <= 2) { toast("A panel needs at least 2 debaters."); return; } S.panel.splice(i, 1); }
+  else {
+    if (S.panel.length >= 3) { toast("A panel holds 3 debaters. Tap one to take them off first."); return; }
+    const used = S.panel.map(p => p.persona);
+    S.panel.push({ face:f, persona: Object.keys(PERSONAS).find(k => !used.includes(k)) || "professor" });
+  }
+  savePanel();
+};
+$("panelRows").onchange = e => { const sel = e.target.closest("select"); if (!sel) return; S.panel[+sel.dataset.i].persona = sel.value; savePanel(); };
 $("faces").onclick = e => { const b = e.target.closest(".face"); if (!b) return; S.face = b.dataset.f; store.set("dm_face", S.face); paintPickers(); };
 $("personas").onclick = e => { const b = e.target.closest(".persona"); if (!b) return; S.persona = b.dataset.p; store.set("dm_persona", S.persona); paintPickers(); };
 ["A","B"].forEach(k => {
@@ -945,6 +1012,8 @@ $("sampleBtn").onclick = async () => {
   btn.disabled = true; btn.textContent = "🔊 Playing…";
   if (S.mode === "watch") {
     for (const k of ["A","B"]) { const d = S.deb[k]; await say(PERSONAS[d.persona].sample.replace("{n}", FACES[d.face].name).replace("you've picked", "they've picked").replace("you'd take", "anyone would take"), { face:d.face, persona:d.persona, quiet:true }); await sleep(250); }
+  } else if (isGroup()) {
+    for (const p of S.panel) { await say(PERSONAS[p.persona].sample.replace("{n}", FACES[p.face].name), { face:p.face, persona:p.persona, quiet:true }); await sleep(250); }
   } else {
     await say(PERSONAS[S.persona].sample.replace("{n}", nameOf()), { face:S.face, persona:S.persona, quiet:true });
   }
@@ -982,15 +1051,19 @@ function buildStage(){
   const box = $("avs"); box.innerHTML = "";
   for (const k in AV) delete AV[k];
   if (S.mode === "watch") {
-    box.classList.add("duo");
+    box.classList.remove("grp"); box.classList.add("duo");
     ["A","B"].forEach(k => { AV[k] = makeAvatar(S.deb[k].face, S.deb[k].persona, k); box.appendChild(AV[k].el); });
     active = AV.A;
+  } else if (isGroup()) {
+    box.classList.remove("duo"); box.classList.add("grp"); box.style.setProperty("--n", S.panel.length);
+    S.panel.forEach((p, i) => { AV["p" + i] = makeAvatar(p.face, p.persona, S.aiSide); box.appendChild(AV["p" + i].el); });
+    active = AV.p0; AV.p0.el.classList.add("live");
   } else {
-    box.classList.remove("duo");
+    box.classList.remove("duo", "grp");
     AV.one = makeAvatar(S.face, S.persona, S.aiSide); box.appendChild(AV.one.el); active = AV.one;
   }
 }
-function setActive(av){ active = av; if (S.mode === "watch") Object.values(AV).forEach(a => a.el.classList.toggle("live", a === av)); }
+function setActive(av){ active = av; if (S.mode === "watch" || isGroup()) Object.values(AV).forEach(a => a.el.classList.toggle("live", a === av)); }
 function setExpr(ex){ if (active) active.set(ex); }
 
 // ---------- voice engine (one blessed audio element, routed through an analyser for lip sync) ----------
@@ -1079,7 +1152,7 @@ function say(text, opt){
       const wav = active;
       if (wav) { wav.set(opt.emotion && opt.emotion !== "calm" ? opt.emotion : "talk"); setTimeout(() => { if (wav.cur !== "calm") wav.set("calm"); }, 1400); }
       try { $("log").open = true; } catch(e) {}
-      if (S.mode === "watch") { endResolve = () => resolve(null); paintCtrls(); return; }   // Next ▶ moves the debate along
+      if (S.mode === "watch" || opt.waitNext) { endResolve = () => resolve(null); paintCtrls(); return; }   // Next ▶ moves the debate along
       resolve(null); return;
     }
     const data = opt.cached || await getVoice(text, opt.face, opt.persona);
@@ -1162,7 +1235,7 @@ function paintTopic(){
   $("tQuestion").textContent = S.frame.question;
   $("badges").innerHTML = S.mode === "watch"
     ? `<span class="badge A">${esc(debName("A"))}: ${esc(S.frame.sideA)}</span><span class="badge B">${esc(debName("B"))}: ${esc(S.frame.sideB)}</span>`
-    : `<span class="badge ${S.userSide}">You: ${esc(sideName(S.userSide))}</span><span class="badge ${S.aiSide}">${esc(nameOf())}: ${esc(sideName(S.aiSide))}</span>`;
+    : `<span class="badge ${S.userSide}">You: ${esc(sideName(S.userSide))}</span><span class="badge ${S.aiSide}">${isGroup() ? "The panel (" + esc(teamName()) + ")" : esc(nameOf())}: ${esc(sideName(S.aiSide))}</span>`;
   paintRounds();
 }
 function paintRounds(){
@@ -1189,7 +1262,7 @@ function thinking(on, msg){
 }
 function addProof(p){ if (p && p.kind && p.kind !== "none") { S.proofs.push(p); S.pIdx = S.proofs.length - 1; paintProof(); } }
 function resetArena(){
-  S.history = []; S.round = 0; S.proofs = []; S.pIdx = -1; S.last = null; S.plan = []; S.wi = 0; S.modQ = null;
+  S.history = []; S.round = 0; S.gi = 0; S.proofs = []; S.pIdx = -1; S.last = null; S.plan = []; S.wi = 0; S.modQ = null;
   $("logList").innerHTML = ""; paintProof();
   $("caption").innerHTML = `<span class="ph">The debate will appear here.</span>`;
 }
@@ -1197,9 +1270,9 @@ function enterArena(){
   $("setup").classList.add("hide"); $("arenaWrap").classList.remove("hide"); $("newTopic").classList.remove("hide");
   window.scrollTo({ top:0, behavior:"smooth" });
   const watch = S.mode === "watch";
-  $("arena").classList.toggle("watch", watch);
+  $("arena").classList.toggle("watch", watch || isGroup());
   $("playMoves").classList.toggle("hide", watch); $("helpMe").classList.toggle("hide", watch); if (watch) closeDraft(); $("watchMoves").classList.toggle("hide", !watch);
-  $("skipBtn").classList.toggle("hide", !watch);
+  $("skipBtn").classList.toggle("hide", !(watch || isGroup()));
   $("challengeProof").dataset.mode = S.mode;
   $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
   $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case.";
@@ -1217,7 +1290,7 @@ function enterArena(){
 function setBusy(b, action){
   S.busy = b;
   ["sendBtn","micBtn","mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof","mMissing","mShouldnt","mNumberOne"].forEach(id => $(id).disabled = b);
-  thinking(b, (THINK[action] || THINK.reply).replace("{n}", nameOf()));
+  thinking(b, (THINK[action] || THINK.reply).replace("{n}", S.speakName || nameOf()));
   if (b) setExpr(action === "reply" || action === "unfair" ? "smug" : "calm");
   paintCtrls();
 }
@@ -1229,6 +1302,7 @@ async function startDebate(){
   await doTurn("open");
 }
 async function doTurn(action, userText){
+  if (isGroup()) return groupTurn(action, userText);
   stopVoice();
   setBusy(true, action);
   if (window.innerWidth < 900) { const r = $("avs").getBoundingClientRect(); if (r.bottom < 80 || r.top > window.innerHeight - 120) $("avs").scrollIntoView({ behavior:"smooth", block:"start" }); }
@@ -1254,6 +1328,64 @@ async function doTurn(action, userText){
     toast(e.name === "AbortError" ? "That took too long. Please try again." : (e.message || "That didn't go through. Please try again."));
     return null;
   }
+}
+
+// ---------- GROUP mode: you vs a panel. Each round one debater leads and a teammate jumps in; the lead rotates. ----------
+function groupHist(i){
+  return S.history.map(h => h.who === "ai" ? (h.k === i ? { who:"ai", text:h.text } : { who:"team", name:h.name, text:h.text }) : { who:h.who, text:h.text });
+}
+function fetchGroupStep(st){
+  const p = S.panel[st.i];
+  return post("/api/debate", {
+    part:"turn", action:st.a, userText: st.q || "",
+    title:S.frame.title, question:S.frame.question, category:S.frame.category, sideA:S.frame.sideA, sideB:S.frame.sideB,
+    aiSide:S.aiSide, persona:p.persona, face:p.face, name:FACES[p.face].name, kid:S.kid,
+    team: S.panel.filter((x, j) => j !== st.i).map(x => FACES[x.face].name),
+    facts:S.facts, history:groupHist(st.i), round:S.round || 1,
+    kind:S.frame.kind, lists:rankLists(), source:S.frame.source || ""
+  }).then(async r => ({ r, data: await getVoice(r.say, p.face, p.persona) }));
+}
+async function groupTurn(action, userText){
+  stopVoice();
+  const token = ++S.wtoken, n = S.panel.length, lead = S.gi % n;
+  const solo = action === "proof" || action === "source";
+  const steps = action === "closing" ? S.panel.map((x, j) => ({ i:(lead + j) % n, a:"closing" }))
+    : solo ? [{ i:lead, a:action }]
+    : [{ i:lead, a:action, q:userText }, { i:(lead + 1) % n, a:"pile_on" }];
+  if (!solo && action !== "closing") S.gi++;
+  const nm = i => FACES[S.panel[i].face].name;
+  S.speakName = nm(steps[0].i); setActive(AV["p" + steps[0].i]); setBusy(true, action);
+  if (window.innerWidth < 900) { const r = $("avs").getBoundingClientRect(); if (r.bottom < 80 || r.top > window.innerHeight - 120) $("avs").scrollIntoView({ behavior:"smooth", block:"start" }); }
+  let pending = fetchGroupStep(steps[0]), ready = false;
+  pending.then(() => ready = true, () => {});
+  try {
+    for (let k = 0; k < steps.length; k++) {
+      const st = steps[k], p = S.panel[st.i], name = nm(st.i), av = AV["p" + st.i];
+      const res = await pending;
+      if (token !== S.wtoken) return null;
+      S.history.push({ who:"ai", text:res.r.say, k:st.i, name });
+      logEntry("ai", name, res.r.say);
+      addProof(res.r.proof);
+      const next = steps[k + 1];
+      if (next) { ready = false; pending = fetchGroupStep(next); pending.then(() => ready = true, () => {}); }
+      setBusy(false);
+      S.last = { text:res.r.say, emotion:res.r.emotion, data:res.data, av, face:p.face, persona:p.persona, speaker:name, side:S.aiSide };
+      await say(res.r.say, { av, face:p.face, persona:p.persona, emotion:res.r.emotion, cached:res.data, speaker:name, side:S.aiSide, waitNext: !!next });
+      if (token !== S.wtoken) return null;
+      if (next) {
+        S.speakName = nm(next.i); setActive(AV["p" + next.i]);
+        if (!ready) setBusy(true, next.a);
+        await sleep(300);
+      }
+    }
+    paintCtrls();
+    return true;
+  } catch (e) {
+    if (token !== S.wtoken) return null;
+    setBusy(false); setExpr("calm");
+    toast(e.name === "AbortError" ? "That took too long. Please try again." : (e.message || "That didn't go through. Please try again."));
+    return null;
+  } finally { if (token === S.wtoken) S.speakName = null; }
 }
 // ---------- help me argue: AI drafts the user's reply, the user approves or asks for changes ----------
 let draftBusy = false, draftNow = "";
@@ -1577,11 +1709,11 @@ async function showJudge(){
   try {
     const body = watch
       ? { part:"judge", title:S.frame.title, nameA:debName("A"), nameB:debName("B"), sideA:S.frame.sideA, sideB:S.frame.sideB, kid:S.kid, history:S.history }
-      : { part:"judge", title:S.frame.title, name:nameOf(), kid:S.kid, history:S.history };
+      : { part:"judge", title:S.frame.title, name:nameOf(), kid:S.kid, history:S.history, group: isGroup() ? teamNames() : undefined };
     if (isRank()) { body.kind = "ranking"; body.lists = watch ? { first:S.rank.A, second:S.rank.alt } : { first:S.rank.mine, second:S.rank.A }; }
     const j = await post("/api/debate", body, 60000);
     const ty = j.you.evidence + j.you.logic + j.you.style, ta = j.ai.evidence + j.ai.logic + j.ai.style;
-    const n1 = watch ? debName("A") : "You", n2 = watch ? debName("B") : nameOf();
+    const n1 = watch ? debName("A") : "You", n2 = watch ? debName("B") : isGroup() ? "The panel" : nameOf();
     const s1 = watch ? S.frame.sideA : sideName(S.userSide), s2 = watch ? S.frame.sideB : sideName(S.aiSide);
     const banner = j.winner === "tie" ? "🤝 It's a tie!" : j.winner === "you" ? (watch ? `🏆 ${esc(n1)} wins!` : "🏆 YOU WIN!") : `🏆 ${esc(n2)} wins!`;
     const col = (title, sc, tot) => `<div class="sc"><h4>${title}</h4>${["evidence","logic","style"].map(k => `<div class="row"><span>${k[0].toUpperCase() + k.slice(1)}</span><div class="bar"><i data-w="${sc[k] * 10}"></i></div><span>${sc[k]}</span></div>`).join("")}<div class="tot">Total: ${tot} / 30</div></div>`;
@@ -1589,7 +1721,7 @@ async function showJudge(){
       <div class="scores">${col(esc(n1) + " (" + esc(s1) + ")", j.you, ty)}${col(esc(n2) + " (" + esc(s2) + ")", j.ai, ta)}</div>
       ${j.compromise && j.compromise.length ? `<div class="complist"><h4>🤝 The judge's compromise list</h4><ol>${j.compromise.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>` : ""}
       <div class="moments"><p>⭐ <b>${watch ? esc(n1) + "'s" : "Your"} best moment:</b> ${esc(j.best_you)}</p><p>🎯 <b>${esc(n2)}'s best moment:</b> ${esc(j.best_ai)}</p><p>💡 <b>${watch ? "Takeaway" : "Tip for next time"}:</b> ${esc(j.tip)}</p></div>
-      <div class="jbtns"><button class="go" id="rematch">🔄 ${watch ? "Run it back, swap sides" : isRank() ? "Rematch" : "Rematch, switch sides"}</button><button class="pill" id="newOpp">🎭 ${watch ? "New debaters" : "New opponent"}</button><button class="pill" id="backDebate">↩ Back to the debate</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
+      <div class="jbtns"><button class="go" id="rematch">🔄 ${watch ? "Run it back, swap sides" : isRank() ? "Rematch" : "Rematch, switch sides"}</button><button class="pill" id="newOpp">🎭 ${watch ? "New debaters" : isGroup() ? "New panel" : "New opponent"}</button><button class="pill" id="backDebate">↩ Back to the debate</button><button class="pill danger" id="jNew">✕ New topic</button></div>`;
     setTimeout(() => $("judgeBody").querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.w + "%"), 60);
     if (j.winner === "you" && !watch) confetti();
     if (watch && j.winner !== "tie") confetti();
