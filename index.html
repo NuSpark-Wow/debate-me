@@ -22,6 +22,9 @@
     setTimeout(end, 1500);
   });
 
+  var lastAct = 0;
+  ["pointerdown", "keydown", "touchstart"].forEach(function (ev) { window.addEventListener(ev, function (e) { if (e.isTrusted) lastAct = Date.now(); }, true); });
+
   var shown = false;
   function show(j) {
     if (shown) return; shown = true;
@@ -52,7 +55,7 @@
     var url = typeof input === "string" ? input : (input && input.url) || String(input || "");
     var u; try { u = new URL(url, location.href); } catch (e) { return of(input, init); }
     if (u.origin !== location.origin || u.pathname.indexOf("/api/") !== 0) return of(input, init);
-    var act = navigator.userActivation ? !!navigator.userActivation.isActive : true;
+    var act = Date.now() - lastAct < 30000;
     return ready.then(function () {
       var o = {}; if (init) for (var k in init) o[k] = init[k];
       var hd = new Headers(o.headers || (typeof input !== "string" && input && input.headers) || undefined);
