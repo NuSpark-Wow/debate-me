@@ -16,7 +16,9 @@
     window.addEventListener("message", function (e) {
       var d = e.data; if (!d || d.type !== "lw-pass") return;
       try { if (!okHost.test(new URL(e.origin).hostname)) return; } catch (x) { return; }
-      LW.pass = d.pass || null; end();
+      LW.pass = d.pass || null;
+      if (d.vid && /^[a-z0-9]{6,40}$/i.test(d.vid)) LW.vid = "w" + d.vid;
+      end();
     });
     try { window.parent.postMessage({ type: "lw-pass-request" }, "*"); } catch (x) {}
     setTimeout(end, 1500);
