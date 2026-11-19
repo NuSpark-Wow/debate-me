@@ -545,6 +545,7 @@ Always call scorecard.`;
 
 // ---------- handler ----------
 module.exports = async (req, res) => {
+  if (!(await require("./_lwgate")(req, res, "debate-me"))) return;
   if (!allowedRequest(req)) return blockRequest(res);
   if (req.method === "GET") {
     return res.json({ ok: true, anthropic_key_set: !!process.env.ANTHROPIC_API_KEY, serper_key_set: !!String(process.env.SERPER_API_KEY || "").trim(), model: MODEL, fast_model: FAST });

@@ -23,6 +23,7 @@ const STYLE = {
 const cache = new Map();
 
 module.exports = async (req, res) => {
+  if (!(await require("./_lwgate")(req, res, "debate-me"))) return;
   if (!allowedRequest(req)) return blockRequest(res);
   const key = process.env.ELEVENLABS_API_KEY;
   if (req.method === "GET") {

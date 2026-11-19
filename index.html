@@ -1,6 +1,74 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- LearnWow member pass (do not remove): gets the member pass from nusparklearnwow.com and shows the Join screen when a visitor runs out of tries -->
+<script>
+(function () {
+  if (window.__lwgate) return; window.__lwgate = 1;
+  var JOIN = "https://nusparklearnwow.com/join/", LOGIN = "https://nusparklearnwow.com/membership-login/";
+  var LW = { pass: null, vid: "" };
+  try { LW.vid = localStorage.getItem("lw_vid") || ""; if (!LW.vid) { LW.vid = (Date.now().toString(36) + Math.random().toString(36).slice(2, 12)); localStorage.setItem("lw_vid", LW.vid); } }
+  catch (e) { LW.vid = "s" + Math.random().toString(36).slice(2, 12); }
+  var okHost = /(^|\.)(nusparklearnwow|nusparkpublishing|nusparkmarketing)\.com$/;
+  var ready = new Promise(function (done) {
+    if (window.parent === window) return done();
+    var fin = false, end = function () { if (!fin) { fin = true; done(); } };
+    window.addEventListener("message", function (e) {
+      var d = e.data; if (!d || d.type !== "lw-pass") return;
+      try { if (!okHost.test(new URL(e.origin).hostname)) return; } catch (x) { return; }
+      LW.pass = d.pass || null; end();
+    });
+    try { window.parent.postMessage({ type: "lw-pass-request" }, "*"); } catch (x) {}
+    setTimeout(end, 1500);
+  });
+
+  var shown = false;
+  function show(j) {
+    if (shown) return; shown = true;
+    var reason = j && j.lwgate;
+    var title = reason === "budget" ? "You've reached this month's limit" : reason === "preview" ? "This is a members feature" : "You've used your tries";
+    var text = reason === "budget"
+      ? "Your membership has hit its monthly usage limit. It resets at the start of next month. Questions? Contact us at nusparklearnwow.com/support."
+      : "Join LearnWow to unlock all 20 experiences. 7-day trial, then $29.99/month. Cancel anytime.";
+    var box = document.createElement("div");
+    box.setAttribute("style", "position:fixed;inset:0;z-index:2147483647;background:rgba(10,25,60,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif");
+    var btn = "display:inline-block;margin:6px;padding:14px 28px;border-radius:40px;font-weight:800;font-size:17px;text-decoration:none;";
+    box.innerHTML =
+      '<div style="background:#123166;color:#fff;max-width:440px;width:100%;border-radius:22px;padding:30px 26px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)">' +
+      '<div style="font-size:40px;line-height:1;color:#F2B33D">&#10022;</div>' +
+      '<div style="font-size:24px;font-weight:800;margin:10px 0 8px">' + title + '</div>' +
+      '<div style="font-size:16px;line-height:1.5;opacity:.92;margin-bottom:18px">' + text + '</div>' +
+      (reason === "budget" ? "" : '<a target="_top" href="' + JOIN + '" style="' + btn + 'background:#F2B33D;color:#123166">Join Now</a>') +
+      '<a target="_top" href="' + LOGIN + '" style="' + btn + 'background:transparent;color:#fff;border:2px solid rgba(255,255,255,.6)">Member Log In</a>' +
+      '<div><button type="button" style="margin-top:10px;background:none;border:0;color:#cfd8ef;font-size:14px;cursor:pointer;text-decoration:underline">Keep looking around</button></div>' +
+      "</div>";
+    box.querySelector("button").onclick = function () { box.remove(); shown = false; };
+    (document.body || document.documentElement).appendChild(box);
+  }
+
+  var of = window.fetch && window.fetch.bind(window);
+  if (!of) return;
+  window.fetch = function (input, init) {
+    var url = typeof input === "string" ? input : (input && input.url) || String(input || "");
+    var u; try { u = new URL(url, location.href); } catch (e) { return of(input, init); }
+    if (u.origin !== location.origin || u.pathname.indexOf("/api/") !== 0) return of(input, init);
+    var act = navigator.userActivation ? !!navigator.userActivation.isActive : true;
+    return ready.then(function () {
+      var o = {}; if (init) for (var k in init) o[k] = init[k];
+      var hd = new Headers(o.headers || (typeof input !== "string" && input && input.headers) || undefined);
+      if (LW.pass) hd.set("x-lw-pass", LW.pass);
+      hd.set("x-lw-vid", LW.vid);
+      if (act) hd.set("x-lw-act", "1");
+      o.headers = hd;
+      return of(input, o);
+    }).then(function (r) {
+      if (r.status === 402) r.clone().json().then(function (j) { if (j && j.lwgate) show(j); }).catch(function () {});
+      return r;
+    });
+  };
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Debate Me</title>
