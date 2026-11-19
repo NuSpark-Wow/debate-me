@@ -519,6 +519,7 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
           <button class="cbtn" id="contBtn" disabled>▶ Continue</button>
           <button class="cbtn" id="replayBtn" disabled>⏮ Replay</button>
           <button class="cbtn hide" id="skipBtn">⏭ Next</button>
+          <button class="cbtn" id="muteBtn" type="button" aria-pressed="false">🔇 Mute</button>
           <label class="rategrp">Voice speed <input type="range" id="rate" min="0.75" max="1.3" step="0.05" value="1"> <span id="rateVal">1.0×</span></label>
         </div>
       </div>
@@ -1129,7 +1130,12 @@ function setHow(h, init){
   $("howSpoken").classList.toggle("on", !written); $("howWritten").classList.toggle("on", written);
   $("startBtn").textContent = written ? "Let's debate! 📝" : "Let's debate! 🎤";
   if (written && !init) stopVoice();
+  const mb = document.getElementById("muteBtn");
+  if (mb){ mb.textContent = written ? "🔊 Sound on" : "🔇 Mute"; mb.setAttribute("aria-pressed", written ? "true" : "false"); }
+  if (!init) { try { paintCtrls(); } catch(e) {} }
 }
+// Mute any time during a debate: switches to words only (no voice, no voice cost); tap again for sound
+document.getElementById("muteBtn").onclick = () => setHow(written ? "spoken" : "written");
 $("howSpoken").onclick = () => setHow("spoken");
 $("howWritten").onclick = () => setHow("written");
 setHow(written ? "written" : "spoken", true);
