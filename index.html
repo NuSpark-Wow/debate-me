@@ -1644,25 +1644,43 @@ $("replyIn").addEventListener("focus", () => holdForModerator());
 $("replyIn").addEventListener("blur", () => { if (!$("replyIn").value.trim()) setTimeout(releaseModerator, 150); });
 
 // ---------- mic ----------
+// Tap 🎤 and talk: your words appear in the box and send when you stop. If this browser can't turn speech
+// into text, the button opens the keyboard instead (every phone keyboard has its own 🎤).
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, listening = false;
-if (!SR) $("micBtn").classList.add("hide");
+let rec = null, listening = false, hintBefore = "";
+function micHint(t){ $("replyHint").textContent = t; }
+function micDone(){ listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; }
 $("micBtn").onclick = () => {
-  if (!SR || (S.busy && S.mode !== "watch")) return;
+  if (!SR) { const t = $("replyIn"); t.focus(); micHint("Tap the 🎤 on your keyboard to talk, or just type."); return; }
+  if (S.busy && S.mode !== "watch") return;
   if (listening) { try { rec.stop(); } catch(e){} return; }
   if (S.mode !== "watch") stopVoice(); else holdForModerator();
   blessVoice();
   rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
   const before = $("replyIn").value;
+  hintBefore = $("replyHint").textContent;
   rec.onresult = ev => {
     let txt = ""; let final = false;
     for (let i = 0; i < ev.results.length; i++) { txt += ev.results[i][0].transcript; if (ev.results[i].isFinal) final = true; }
     $("replyIn").value = (before ? before + " " : "") + txt;
     if (final) { try { rec.stop(); } catch(e){} }
   };
-  rec.onend = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; if ($("replyIn").value.trim() && $("replyIn").value.trim() !== before.trim()) userSays($("replyIn").value); else releaseModerator(); };
-  rec.onerror = () => { listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; releaseModerator(); };
-  try { rec.start(); listening = true; $("micBtn").classList.add("listening"); $("micBtn").textContent = "■"; } catch(e){}
+  let failed = false;
+  rec.onend = () => {
+    micDone();
+    if (failed) return;
+    micHint(hintBefore);
+    if ($("replyIn").value.trim() && $("replyIn").value.trim() !== before.trim()) userSays($("replyIn").value); else releaseModerator();
+  };
+  rec.onerror = e => {
+    failed = true; micDone(); releaseModerator();
+    const err = e && e.error;
+    if (err === "not-allowed" || err === "service-not-allowed") micHint("The microphone is blocked. Allow it in your browser settings, or tap the 🎤 on your keyboard and talk.");
+    else if (err === "no-speech") micHint("Didn't catch that. Tap 🎤 and try again.");
+    else if (err === "audio-capture") micHint("No microphone found. You can type instead.");
+    else micHint(hintBefore);
+  };
+  try { rec.start(); listening = true; $("micBtn").classList.add("listening"); $("micBtn").textContent = "■"; micHint("🎤 Listening… make your case. It sends when you stop talking. Tap ■ to stop."); } catch(e){ micDone(); }
 };
 
 // ---------- proof board ----------
