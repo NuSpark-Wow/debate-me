@@ -13,7 +13,12 @@ module.exports = async function lwGate(req, res, tool) {
   try {
     const r = await fetch(GATE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
     const j = await r.json();
-    if (!j || j.ok !== false) return true;
+    if (!j || j.ok !== false) {
+      if (j && j.who === "visitor" && typeof j.left === "number") {   // tells the page how many tries are left
+        try { res.setHeader("X-LW-Left", String(j.left)); if (j.total) res.setHeader("X-LW-Total", String(j.total)); } catch (e) {}
+      }
+      return true;
+    }
     res.statusCode = 402;
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Content-Type", "application/json");
