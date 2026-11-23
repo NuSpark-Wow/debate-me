@@ -51,6 +51,29 @@
     (document.body || document.documentElement).appendChild(box);
   }
 
+  // Tries left: a small note for visitors ("3 of 8 tries left"), plus a friendly heads-up on the last one.
+  var nudged = false;
+  function tries(left, total) {
+    if (!(left >= 0)) return;
+    var el = document.getElementById("lwTries");
+    if (!el) {
+      el = document.createElement("div"); el.id = "lwTries";
+      el.setAttribute("style", "position:fixed;left:12px;bottom:12px;z-index:2147483646;background:#123166;color:#fff;border:2px solid #F2B33D;border-radius:999px;padding:7px 12px 7px 14px;font:600 13px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.3);display:flex;gap:8px;align-items:center");
+      (document.body || document.documentElement).appendChild(el);
+    }
+    el.innerHTML = '<span>&#10022; ' + left + (total ? ' of ' + total : '') + ' tr' + (left === 1 ? 'y' : 'ies') + ' left</span><a target="_top" href="' + JOIN + '" style="color:#F2B33D;font-weight:800;text-decoration:none">Join</a><button type="button" aria-label="Hide" style="background:none;border:0;color:#cfd8ef;font-size:15px;cursor:pointer;padding:0 0 0 2px">&times;</button>';
+    el.querySelector("button").onclick = function () { el.remove(); };
+    if (left === 1 && !nudged) {
+      nudged = true;
+      var n = document.createElement("div");
+      n.setAttribute("style", "position:fixed;left:12px;bottom:58px;z-index:2147483646;max-width:300px;background:#fff;color:#123166;border-radius:14px;padding:12px 14px;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 10px 26px rgba(0,0,0,.3);border-top:4px solid #F2B33D");
+      n.innerHTML = '<b>One try left!</b><br>Members get every one of the 24+ experiences, with no limits. Start with a 7-day trial and cancel anytime.<div style="margin-top:8px"><a target="_top" href="' + JOIN + '" style="background:#F2B33D;color:#123166;font-weight:800;padding:7px 14px;border-radius:999px;text-decoration:none">See membership</a> <button type="button" style="background:none;border:0;color:#123166;text-decoration:underline;cursor:pointer;font-size:13px">Got it</button></div>';
+      n.querySelector("button").onclick = function () { n.remove(); };
+      (document.body || document.documentElement).appendChild(n);
+      setTimeout(function () { if (n.parentNode) n.remove(); }, 15000);
+    }
+  }
+
   var of = window.fetch && window.fetch.bind(window);
   if (!of) return;
   window.fetch = function (input, init) {
@@ -68,6 +91,7 @@
       return of(input, o);
     }).then(function (r) {
       if (r.status === 402) r.clone().json().then(function (j) { if (j && j.lwgate) show(j); }).catch(function () {});
+      try { var tl = r.headers.get("x-lw-left"); if (tl !== null && r.status !== 402) tries(parseInt(tl, 10), parseInt(r.headers.get("x-lw-total") || "0", 10)); } catch (e) {}
       return r;
     });
   };
