@@ -650,9 +650,9 @@ body.written #pauseBtn,body.written #contBtn,body.written #replayBtn,body.writte
     </div>
 
     <div class="reply" id="replyBox">
-      <div class="lab"><span id="replyLab" style="color:var(--ink);font-weight:800;font-size:15px">Your turn</span> <span id="replyHint">Type or tap 🎤 and make your case.</span></div>
+      <div class="lab"><span id="replyLab" style="color:var(--ink);font-weight:800;font-size:15px">Your turn</span> <span id="replyHint">Type or tap 🎤 and make your case. Tap 🎤 anytime to jump in: they stop and listen.</span></div>
       <div class="rrow">
-        <button class="mic" id="micBtn" title="Talk">🎤</button>
+        <button class="mic" id="micBtn" title="Talk. Tap anytime to jump in.">🎤</button>
         <textarea id="replyIn" maxlength="2000" aria-label="Your argument"></textarea>
         <button class="send" id="sendBtn">Send ➤</button>
       </div>
@@ -1388,7 +1388,7 @@ function enterArena(){
   $("skipBtn").classList.toggle("hide", !(watch || isGroup()));
   $("challengeProof").dataset.mode = S.mode;
   $("replyLab").textContent = watch ? "🙋 You're the moderator" : "Your turn";
-  $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case.";
+  $("replyHint").textContent = watch ? "Jump in anytime: the debate pauses while you talk or type, then both answer you." : "Type or tap 🎤 and make your case. Tap 🎤 anytime to jump in: they stop and listen.";
   $("replyIn").setAttribute("aria-label", watch ? "Ask a question or make a point" : "Your argument");
   $("sendBtn").textContent = watch ? "Ask ➤" : "Send ➤";
   const rk = isRank();
@@ -1402,7 +1402,7 @@ function enterArena(){
 // ---------- PLAY mode: you vs one debater ----------
 function setBusy(b, action){
   S.busy = b;
-  ["sendBtn","micBtn","mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof","mMissing","mShouldnt","mNumberOne"].forEach(id => $(id).disabled = b);
+  ["mProof","mSource","mUnfair","mSwitch","mJudge","challengeProof","mMissing","mShouldnt","mNumberOne"].forEach(id => $(id).disabled = b);
   thinking(b, (THINK[action] || THINK.reply).replace("{n}", S.speakName || nameOf()));
   if (b) setExpr(action === "reply" || action === "unfair" ? "smug" : "calm");
   paintCtrls();
@@ -1431,6 +1431,7 @@ async function doTurn(action, userText){
     logEntry("ai", nameOf(), r.say);
     addProof(r.proof);
     setBusy(false);
+    if (S.queued) { const q = S.queued; S.queued = null; paintCtrls(); userSays(q); return r; }
     S.last = { text:r.say, emotion:r.emotion, data:null, av:AV.one, face:S.face, persona:S.persona };
     const data = await say(r.say, { av:AV.one, face:S.face, persona:S.persona, emotion:r.emotion });
     if (S.last && S.last.text === r.say) S.last.data = data;
@@ -1438,6 +1439,7 @@ async function doTurn(action, userText){
     return r;
   } catch (e) {
     setBusy(false); setExpr("calm");
+    if (S.queued) { const q = S.queued; S.queued = null; userSays(q); return null; }
     toast(e.name === "AbortError" ? "That took too long. Please try again." : (e.message || "That didn't go through. Please try again."));
     return null;
   }
@@ -1482,6 +1484,7 @@ async function groupTurn(action, userText){
       const next = steps[k + 1];
       if (next) { ready = false; pending = fetchGroupStep(next); pending.then(() => ready = true, () => {}); }
       setBusy(false);
+      if (S.queued) { const q = S.queued; S.queued = null; paintCtrls(); userSays(q); return null; }
       S.last = { text:res.r.say, emotion:res.r.emotion, data:res.data, av, face:p.face, persona:p.persona, speaker:name, side:S.aiSide };
       await say(res.r.say, { av, face:p.face, persona:p.persona, emotion:res.r.emotion, cached:res.data, speaker:name, side:S.aiSide, waitNext: !!next });
       if (token !== S.wtoken) return null;
@@ -1496,6 +1499,7 @@ async function groupTurn(action, userText){
   } catch (e) {
     if (token !== S.wtoken) return null;
     setBusy(false); setExpr("calm");
+    if (S.queued) { const q = S.queued; S.queued = null; userSays(q); return null; }
     toast(e.name === "AbortError" ? "That took too long. Please try again." : (e.message || "That didn't go through. Please try again."));
     return null;
   } finally { if (token === S.wtoken) S.speakName = null; }
@@ -1540,7 +1544,7 @@ function userSays(text, action){
   if (!text) return;
   blessVoice();
   if (S.mode === "watch") { askModerator(text); return; }
-  if (S.busy) return;
+  if (S.busy) { S.queued = text; $("replyIn").value = ""; toast("Got it! They'll stop and listen to you next."); return; }
   closeDraft();
   S.history.push({ who:"user", text }); logEntry("user", "You", text);
   S.round++; paintRounds();
@@ -1681,40 +1685,47 @@ $("replyIn").addEventListener("blur", () => { if (!$("replyIn").value.trim()) se
 // Tap 🎤 and talk: your words appear in the box and send when you stop. If this browser can't turn speech
 // into text, the button opens the keyboard instead (every phone keyboard has its own 🎤).
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, listening = false, hintBefore = "";
+let rec = null, listening = false, hintBefore = "", stopAsked = false;
 function micHint(t){ $("replyHint").textContent = t; }
 function micDone(){ listening = false; $("micBtn").classList.remove("listening"); $("micBtn").textContent = "🎤"; }
 $("micBtn").onclick = () => {
   if (!SR) { const t = $("replyIn"); t.focus(); micHint("Tap the 🎤 on your keyboard to talk, or just type."); return; }
-  if (S.busy && S.mode !== "watch") return;
-  if (listening) { try { rec.stop(); } catch(e){} return; }
+  if (listening) { stopAsked = true; try { rec.stop(); } catch(e){} return; }
   if (S.mode !== "watch") stopVoice(); else holdForModerator();
   blessVoice();
-  rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
-  const before = $("replyIn").value;
+  rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
+  const before = $("replyIn").value.trim();
   hintBefore = $("replyHint").textContent;
+  let said = "", heard = false, failed = false, silenceT = null; const started = Date.now();
+  stopAsked = false;
+  const finish = () => { stopAsked = true; try { rec.stop(); } catch(e){} };
+  // waits 2.5 seconds after your last word (10 seconds if you haven't started yet), so a short pause doesn't cut you off
+  const arm = () => { clearTimeout(silenceT); silenceT = setTimeout(finish, heard ? 2500 : 10000); };
   rec.onresult = ev => {
-    let txt = ""; let final = false;
-    for (let i = 0; i < ev.results.length; i++) { txt += ev.results[i][0].transcript; if (ev.results[i].isFinal) final = true; }
-    $("replyIn").value = (before ? before + " " : "") + txt;
-    if (final) { try { rec.stop(); } catch(e){} }
+    let live = "";
+    for (let i = ev.resultIndex; i < ev.results.length; i++) { const t = ev.results[i][0].transcript; if (ev.results[i].isFinal) said += (said ? " " : "") + t.trim(); else live += t; }
+    $("replyIn").value = [before, said, live.trim()].filter(Boolean).join(" ");
+    heard = true; arm();
   };
-  let failed = false;
   rec.onend = () => {
-    micDone();
+    // some browsers switch the mic off on their own after a pause: switch it back on until you're done
+    if (!stopAsked && !failed && Date.now() - started < 90000) { try { rec.start(); return; } catch(e){} }
+    clearTimeout(silenceT); micDone();
     if (failed) return;
     micHint(hintBefore);
-    if ($("replyIn").value.trim() && $("replyIn").value.trim() !== before.trim()) userSays($("replyIn").value); else releaseModerator();
+    const v = $("replyIn").value.trim();
+    if (v && v !== before) userSays(v); else releaseModerator();
   };
   rec.onerror = e => {
-    failed = true; micDone(); releaseModerator();
     const err = e && e.error;
+    if (err === "no-speech" || err === "aborted") { if (heard) stopAsked = true; else if (err === "no-speech") { failed = true; micDone(); releaseModerator(); micHint("Didn't catch that. Tap 🎤 and try again."); } return; }
+    failed = true; clearTimeout(silenceT); micDone(); releaseModerator();
     if (err === "not-allowed" || err === "service-not-allowed") micHint("The microphone is blocked. Allow it in your browser settings, or tap the 🎤 on your keyboard and talk.");
-    else if (err === "no-speech") micHint("Didn't catch that. Tap 🎤 and try again.");
     else if (err === "audio-capture") micHint("No microphone found. You can type instead.");
+    else if (err === "network") micHint("The voice-to-text service didn't answer. Try again, or type.");
     else micHint(hintBefore);
   };
-  try { rec.start(); listening = true; $("micBtn").classList.add("listening"); $("micBtn").textContent = "■"; micHint("🎤 Listening… make your case. It sends when you stop talking. Tap ■ to stop."); } catch(e){ micDone(); }
+  try { rec.start(); listening = true; arm(); $("micBtn").classList.add("listening"); $("micBtn").textContent = "■"; micHint("🎤 Listening… take your time. It sends 2 seconds after you stop talking, or tap ■ to send now."); } catch(e){ micDone(); }
 };
 
 // ---------- proof board ----------
